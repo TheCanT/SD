@@ -1,22 +1,35 @@
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class Cliente implements Runnable {
 
-    public static void main(String[] args) throws IOException {
-        Socket s = new Socket("localhost",35353);
-        PrintWriter pw = new PrintWriter(s.getOutputStream(), true);
-
-        pw.write("ola servidor daqui user");
-        pw.flush();
+    public static void main(String[] args){
         try {
-            Thread.sleep(12000);
-        } catch (InterruptedException e) {
+            Socket s = new Socket("localhost",12345);
+
+            PrintWriter out = new PrintWriter(s.getOutputStream());
+            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
+
+            Scanner scan = new Scanner(new FileReader(new File("/home/gonca/Desktop/test.mp3")));
+            String cli_ter = "";
+            while(scan.hasNextLine() && !cli_ter.equals("quit")){
+
+                cli_ter = scan.nextLine();
+
+                out.println(cli_ter);
+                out.flush();
+
+                System.out.println("Resposta do Servidor : " + in.readLine());
+            }
+
+            s.shutdownOutput();
+            s.shutdownInput();
+            s.close();
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("asdasd");
     }
 
     @Override

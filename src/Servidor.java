@@ -1,21 +1,30 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Set;
+import org.json.*;
 
 public class Servidor implements Runnable {
     private String path;
 
-    public static void main(String[] args) throws IOException {
-        ServerSocket ss = new ServerSocket(35353);
-        Socket s = ss.accept();
-        BufferedReader is = new BufferedReader(new InputStreamReader(s.getInputStream()));
+    public static void main(String[] args) {
+        ServerSocket sv_socket = null;
         try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println(is.readLine() + "----acabou sv");
+            sv_socket = new ServerSocket(12345);
+
+            while (true) {
+                Socket new_cli_socket = sv_socket.accept();
+
+                ThServer wk = new ThServer(new_cli_socket);
+                Thread th = new Thread(wk);
+
+                th.start();
+            }
+        } catch (IOException e) {
+        e.printStackTrace();
     }
+
+}
 
     @Override
     public void run() {
