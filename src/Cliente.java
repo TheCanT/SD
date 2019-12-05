@@ -11,8 +11,9 @@ public class Cliente implements Runnable {
             PrintWriter out = new PrintWriter(s.getOutputStream());
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 
-            Scanner scan = new Scanner(new FileReader(new File("/home/gonca/Desktop/test.mp3")));
+            Scanner scan = new Scanner(System.in);//new FileReader(new File("/home/gonca/Desktop/test.mp3")));
             String cli_ter = "";
+
             while(scan.hasNextLine() && !cli_ter.equals("quit")){
 
                 cli_ter = scan.nextLine();
