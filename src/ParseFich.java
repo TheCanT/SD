@@ -51,22 +51,22 @@ public class ParseFich {
     }
 
 
-    public static void saveMusicas(Map<String,Musica> musicas, String path) throws IOException {
+    public static void saveMusicas(Map<String, Music> musicas, String path) throws IOException {
         PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(path)));
         StringBuilder sb = null;
 
-        for(Musica musica : musicas.values()){
+        for(Music musica : musicas.values()){
             sb = new StringBuilder();
-            sb.append(musica.getTitulo()).append("«")
-                    .append(musica.getArtista()).append("«")
-                    .append(musica.getAno()).append("«");
+            sb.append(musica.getTitle()).append("«")
+                    .append(musica.getArtist()).append("«")
+                    .append(musica.getYear()).append("«");
 
-            for(String etiqueta : musica.getEtiquetas())
+            for(String etiqueta : musica.getTags())
                 sb.append(etiqueta).append("»");
 
             sb.append("«");
 
-            for(String dono : musica.getDonos())
+            for(String dono : musica.getOwners())
                 sb.append(dono).append("»");
 
             pw.println(sb.toString());
@@ -76,8 +76,8 @@ public class ParseFich {
         pw.close();
     }
 
-    public static Map<String,Musica> loadMusicas(String path) throws IOException {
-        Map<String,Musica> musicas = new HashMap<>();
+    public static Map<String, Music> loadMusicas(String path) throws IOException {
+        Map<String, Music> musicas = new HashMap<>();
         String[] music_split = null;
         String[] etiquetas_split = null;
         String[] donos_split = null;
@@ -95,7 +95,12 @@ public class ParseFich {
             donos_split = music_split[DONOS].split("»");
             donos = new HashSet<>(Arrays.asList(donos_split));
 
-            musicas.put(music_split[TITULO]+"_"+music_split[ARTISTA],new Musica(music_split[TITULO],music_split[ARTISTA],parseInt(music_split[ANO]),etiquetas,donos));
+            musicas.put(music_split[TITULO]+parseInt(music_split[ANO])+music_split[ARTISTA],
+                    new Music(music_split[TITULO],
+                            music_split[ARTISTA],
+                            parseInt(music_split[ANO]),
+                            etiquetas,
+                            donos));
         }
 
         return musicas;
@@ -108,7 +113,7 @@ public class ParseFich {
     public static void main(String[] args) {
 
         try{
-            Map<String, Musica> mm = ParseFich.loadMusicas("/home/gonca/Desktop/test_music");
+            Map<String, Music> mm = ParseFich.loadMusicas("/home/gonca/Desktop/test_music");
             Map<String, User> mu = ParseFich.loadUsers("/home/gonca/Desktop/test_user");
 
             ParseFich.saveMusicas(mm,"/home/gonca/Desktop/test_music");

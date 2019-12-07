@@ -4,6 +4,7 @@ import java.net.Socket;
 public class ThServer implements Runnable{
     Socket cli_socket;
 
+
     public ThServer(Socket s) {
         cli_socket = s;
     }
@@ -12,6 +13,10 @@ public class ThServer implements Runnable{
     public void run() {
         BufferedReader in = null;
         try {
+            AccessData ad = new AccessData();
+
+
+
             in = new BufferedReader(new InputStreamReader(cli_socket.getInputStream()));
 
             PrintWriter out = new PrintWriter(cli_socket.getOutputStream());
@@ -20,15 +25,26 @@ public class ThServer implements Runnable{
             System.out.println(" ----  Outro Cliente  ---- ");
             cli_resposta = in.readLine();
 
+            String [] splited = null;
             while (cli_resposta!= null){
-
-                FileWriter out_file = new FileWriter(new File("/home/gonca/Desktop/test2.mp3"),true);
-                out_file.append(cli_resposta+"\n");
-                out_file.flush();
-
-                System.out.println("Mensagem : " + cli_resposta);
-
-                out.println(cli_resposta+" 2.0");
+                System.out.println(cli_resposta);
+                splited = cli_resposta.split(" ");
+                try{
+                    if(splited[0].equals("registar")){
+                        ad.register(splited[1],splited[2]);
+                    }else
+                    if(splited[0].equals("login")){
+                        ad.login(splited[1],splited[2]);
+                    }else
+                    if(splited[0].equals("logout")){
+                        ad.logout(splited[1]);
+                    }
+                    //else out.println("Não existe comando: "+cli_resposta);
+                    out.println(cli_resposta);
+                }
+                catch(Exception e){
+                    out.println(e.getMessage());
+                }
                 out.flush();
 
                 cli_resposta = in.readLine();
