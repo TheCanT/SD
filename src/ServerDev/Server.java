@@ -1,10 +1,10 @@
+package ServerDev;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Set;
-import org.json.*;
 
-public class Servidor implements Runnable {
+public class Server implements Runnable {
     private String path;
 
     public static void main(String[] args) {
@@ -15,7 +15,7 @@ public class Servidor implements Runnable {
             while (true) {
                 Socket new_cli_socket = sv_socket.accept();
 
-                ThServer wk = new ThServer(new_cli_socket);
+                ServerConnection wk = new ServerConnection(new_cli_socket);
                 Thread th = new Thread(wk);
 
                 th.start();

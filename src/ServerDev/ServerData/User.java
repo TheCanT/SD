@@ -1,3 +1,5 @@
+package ServerDev.ServerData;
+
 import java.util.concurrent.locks.ReentrantLock;
 
 public class User {

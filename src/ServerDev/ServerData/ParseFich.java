@@ -1,3 +1,5 @@
+package ServerDev.ServerData;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -25,7 +27,7 @@ public class ParseFich {
 
 
 
-    public static void saveUsers(Map<String,User> users, String path) throws IOException {
+    public static void saveUsers(Map<String, User> users, String path) throws IOException {
         PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(path)));
 
         for(User user : users.values()){

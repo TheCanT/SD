@@ -1,8 +1,10 @@
+package ClientDev;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class Cliente implements Runnable {
+public class Client implements Runnable {
 
     public static void main(String[] args){
         try {
@@ -21,7 +23,7 @@ public class Cliente implements Runnable {
                 out.println(cli_ter);
                 out.flush();
 
-                System.out.println("Resposta do Servidor : " + in.readLine());
+                System.out.println("Resposta do ServerDev.Servidor : " + in.readLine());
             }
 
             s.shutdownOutput();

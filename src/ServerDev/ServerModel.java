@@ -1,7 +1,9 @@
-import Exceptions.ExceptionLogin;
-import Exceptions.ExceptionLogout;
-import Exceptions.ExceptionRegister;
-import Exceptions.ExceptionUpload;
+package ServerDev;
+
+import Exceptions.*;
+import ServerDev.ServerData.Music;
+import ServerDev.ServerData.ParseFich;
+import ServerDev.ServerData.User;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -9,13 +11,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class AccessData {
+public class ServerModel {
 
-    private Map<String,User> users;
+    private Map<String, User> users;
     private ReentrantLock lock_users;
 
 
-    public AccessData() throws IOException {
+    public ServerModel() throws IOException {
         this.users = ParseFich.loadUsers("/home/gonca/Desktop/test_user");
         this.lock_users = new ReentrantLock();
         this.musics = ParseFich.loadMusicas("/home/gonca/Desktop/test_music");
@@ -37,6 +39,7 @@ public class AccessData {
             User user = users.get(user_in);
 
             user.lockUser();
+            // deveria adicionar uma condition pq se alguem já estiver a dar login
             lock_users.unlock();
 
             if(user.getLogged()){
@@ -113,8 +116,8 @@ public class AccessData {
     private ReentrantLock lock_musics;
 
 
-    public void upload(String name_upload, String title_upload, String year_upload, Collection<String> tags_upload)
-            throws ExceptionUpload {
+    public void upload(String name_upload, String title_upload, String year_upload,
+                       Collection<String> tags_upload, String user_online) throws ExceptionUpload {
         lock_musics.lock();
 
         if(musics.containsKey(Music.tryKey(name_upload,title_upload,year_upload))){
@@ -123,30 +126,86 @@ public class AccessData {
             music.lockMusic();
             lock_musics.unlock();
 
-            music.addOwner("OWNER");
+            music.addOwner(user_online);
 
             music.unlockMusic();
-            throw new ExceptionUpload("This Music Already Exists, Your Account Was Added As Owner.");
+            throw new ExceptionUpload("This ServerDev.ServerData.Music Already Exists, " +
+                    "Your Account Was Added As Owner.");
         }
 
         Collection<String> owners = new HashSet<>();
-        owners.add("OWNER");
+        owners.add(user_online);
         Music music = new Music(name_upload,title_upload,Integer.parseInt(year_upload),tags_upload,owners);
 
         music.lockMusic();
         lock_musics.unlock();
 
 
-
-        /**
-         * AQUI FICA O CÓDIGO QUE É RESPONSÁVEL
-         * POR COPIAR O FICHEIRO PARA O SV
+        /*
+          AQUI FICA O CÓDIGO QUE É RESPONSÁVEL
+          POR COPIAR O FICHEIRO PARA O SV
          */
 
         music.unlockMusic();
     }
 
-    public void download(){
+    public void download(String input, boolean download_by_key) throws ExceptionDownload {
+        if(download_by_key){
+            this.downloadByKey(input);
+        }
+        else {
+            this.downloadByTitleArtistYear(input);
+        }
+    }
+
+    private void downloadByKey(String music_key) throws ExceptionDownload {
+        lock_musics.lock();
+        if(musics.containsKey(music_key)){
+            Music music = musics.get(music_key);
+
+            music.lockMusic();
+            lock_musics.unlock();
+
+            /*
+              AQUI FICA O METODO RESPONSAVEL POR COPIAR O FICHEIRO
+             */
+
+            music.unlockMusic();
+        }
+        else{
+            lock_musics.unlock();
+            throw new ExceptionDownload("This Key Is Invalid, Check The Spelling.");
+        }
+    }
+
+    private void downloadByTitleArtistYear(String music_parameters) throws ExceptionDownload {
+        String [] parameter = music_parameters.split(" ");
+
+        if(parameter.length == 3){
+            String try_key = Music.tryKey(parameter[0],parameter[1],parameter[2]);
+
+            lock_musics.lock();
+
+            if(musics.containsKey(try_key)){
+                Music music = musics.get(try_key);
+
+                music.lockMusic();
+                lock_musics.unlock();
+
+                /*
+                  AQUI FICA O METODO RESPONSAVEL POR COPIAR O FICHEIRO
+                 */
+
+                music.unlockMusic();
+            }
+            else {
+                lock_musics.unlock();
+                throw new ExceptionDownload("This Key Is Invalid, Check The Spelling.");
+            }
+        }
+        else{
+            throw new ExceptionDownload("The Parameters Were Not Correctly Filled.");
+        }
 
     }
 

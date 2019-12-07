@@ -1,11 +1,15 @@
+package ServerDev;
+
+
 import java.io.*;
 import java.net.Socket;
 
-public class ThServer implements Runnable{
-    Socket cli_socket;
+public class ServerConnection implements Runnable{
+    private Socket cli_socket;
+    private String user_logged_in;
 
 
-    public ThServer(Socket s) {
+    public ServerConnection(Socket s) {
         cli_socket = s;
     }
 
@@ -13,7 +17,7 @@ public class ThServer implements Runnable{
     public void run() {
         BufferedReader in = null;
         try {
-            AccessData ad = new AccessData();
+            ServerModel ad = new ServerModel();
 
 
 
@@ -22,7 +26,7 @@ public class ThServer implements Runnable{
             PrintWriter out = new PrintWriter(cli_socket.getOutputStream());
 
             String cli_resposta = null;
-            System.out.println(" ----  Outro Cliente  ---- ");
+            System.out.println(" ----  Outro ClientDev.Cliente  ---- ");
             cli_resposta = in.readLine();
 
             String [] splited = null;
@@ -35,6 +39,8 @@ public class ThServer implements Runnable{
                     }else
                     if(splited[0].equals("login")){
                         ad.login(splited[1],splited[2]);
+                        user_logged_in = splited[1];
+
                     }else
                     if(splited[0].equals("logout")){
                         ad.logout(splited[1]);
