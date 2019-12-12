@@ -25,7 +25,6 @@ public class ServerModel {
         this.musics = ParseFich.loadMusicas("/home/gonca/Desktop/test_music");
         this.lock_musics = new ReentrantLock();
         this.transfer_control = new TransferControl();
-
     }
 
     /**
@@ -90,7 +89,7 @@ public class ServerModel {
             lock_users.unlock();
 
 
-            if(user.getNumCurrentTransfers() != 0)
+            if(user.getNumCurrentTransfers() > 0)
                 throw new ExceptionLogout("You Can Not Logout With Transfers Remaining.");
 
 
@@ -267,8 +266,9 @@ public class ServerModel {
 
         for(Music m : musics_now){
             m.lockMusic();
-            if(music_tags.containsAll(m.getTags()))
-                musics_with_tags.add(m.getKey());
+            for(String tag : m.getTags())
+                if(music_tags.contains(tag))
+                    musics_with_tags.add(m.getKey()+" : "+m.getArtist()+" - "+m.getTitle()+" - "+m.getYear());
             m.unlockMusic();
         }
 

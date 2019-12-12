@@ -26,9 +26,9 @@ public class Client implements Runnable {
 
                 server_response = in.readLine();
 
-                System.out.println(" --- --- "+cli_ter+" --- --- \n"
+                System.out.println(" --- --- "+cli_ter+" --- --- \n\n"
                                          + server_response +
-                                 "\n --- --- "+cli_ter+" --- --- \n");
+                                 "\n\n --- --- "+cli_ter+" --- --- \n");
             }
 
             s.shutdownOutput();
