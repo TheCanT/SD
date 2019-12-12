@@ -34,14 +34,19 @@ public class ServerConnection implements Runnable{
                 System.out.println(cli_resposta);
                 splited = cli_resposta.split(" ");
                 try{
+                    if(splited[0].equals("quit")){
+                        throw new Exception("quit");
+                    }
+                    else
                     if(splited[0].equals("registar")){
                         ad.register(splited[1],splited[2]);
-                    }else
+                    }
+                    else
                     if(splited[0].equals("login")){
                         ad.login(splited[1],splited[2]);
                         user_logged_in = splited[1];
-
-                    }else
+                    }
+                    else
                     if(splited[0].equals("logout")){
                         ad.logout(splited[1]);
                     }

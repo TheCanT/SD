@@ -15,8 +15,8 @@ public class Server implements Runnable {
             while (true) {
                 Socket new_cli_socket = sv_socket.accept();
 
-                ServerConnection wk = new ServerConnection(new_cli_socket);
-                Thread th = new Thread(wk);
+                ServerConnection sc = new ServerConnection(new_cli_socket);
+                Thread th = new Thread(sc);
 
                 th.start();
             }

@@ -65,13 +65,6 @@ public class ParseFich {
 
             for(String etiqueta : musica.getTags())
                 sb.append(etiqueta).append("»");
-
-            sb.append("«");
-
-            for(String dono : musica.getOwners())
-                sb.append(dono).append("»");
-
-            pw.println(sb.toString());
         }
 
         pw.flush();
@@ -101,8 +94,7 @@ public class ParseFich {
                     new Music(music_split[TITULO],
                             music_split[ARTISTA],
                             parseInt(music_split[ANO]),
-                            etiquetas,
-                            donos));
+                            etiquetas));
         }
 
         return musicas;

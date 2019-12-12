@@ -4,6 +4,7 @@ import Exceptions.*;
 import ServerDev.ServerData.Music;
 import ServerDev.ServerData.ParseFich;
 import ServerDev.ServerData.User;
+import ServerDev.ServerThroughput.TransferControl;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -20,8 +21,11 @@ public class ServerModel {
     public ServerModel() throws IOException {
         this.users = ParseFich.loadUsers("/home/gonca/Desktop/test_user");
         this.lock_users = new ReentrantLock();
+
         this.musics = ParseFich.loadMusicas("/home/gonca/Desktop/test_music");
         this.lock_musics = new ReentrantLock();
+        this.transfer_control = new TransferControl();
+
     }
 
     /**
@@ -39,7 +43,6 @@ public class ServerModel {
             User user = users.get(user_in);
 
             user.lockUser();
-            // deveria adicionar uma condition pq se alguem já estiver a dar login
             lock_users.unlock();
 
             if(user.getLogged()){
@@ -106,7 +109,6 @@ public class ServerModel {
         }
 
         users.put(user_reg,new User(user_reg,pass_reg));
-
         lock_users.unlock();
     }
 
@@ -114,10 +116,11 @@ public class ServerModel {
 
     private Map<String, Music> musics;
     private ReentrantLock lock_musics;
+    private TransferControl transfer_control;
 
 
     public void upload(String name_upload, String title_upload, String year_upload,
-                       Collection<String> tags_upload, String user_online) throws ExceptionUpload {
+                       Collection<String> tags_upload) throws ExceptionUpload {
         lock_musics.lock();
 
         if(musics.containsKey(Music.tryKey(name_upload,title_upload,year_upload))){
@@ -126,25 +129,25 @@ public class ServerModel {
             music.lockMusic();
             lock_musics.unlock();
 
-            music.addOwner(user_online);
-
             music.unlockMusic();
-            throw new ExceptionUpload("This ServerDev.ServerData.Music Already Exists, " +
-                    "Your Account Was Added As Owner.");
+            throw new ExceptionUpload("This Music Already Exists, Your Account Was Added As Owner.");
         }
 
         Collection<String> owners = new HashSet<>();
-        owners.add(user_online);
-        Music music = new Music(name_upload,title_upload,Integer.parseInt(year_upload),tags_upload,owners);
+        Music music = new Music(name_upload,title_upload,Integer.parseInt(year_upload),tags_upload);
 
         music.lockMusic();
         lock_musics.unlock();
 
+        try {
+            transfer_control.startUpload();
 
-        /*
-          AQUI FICA O CÓDIGO QUE É RESPONSÁVEL
-          POR COPIAR O FICHEIRO PARA O SV
-         */
+            //transferencia.
+
+            transfer_control.endUpload();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         music.unlockMusic();
     }
@@ -166,10 +169,21 @@ public class ServerModel {
             music.lockMusic();
             lock_musics.unlock();
 
-            /*
-              AQUI FICA O METODO RESPONSAVEL POR COPIAR O FICHEIRO
-             */
+            music.addReader();
+            music.unlockMusic();
 
+            try {
+                transfer_control.startDownload();
+
+                //transferencia
+
+                transfer_control.endDownload();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            music.lockMusic();
+            music.takeReader();
             music.unlockMusic();
         }
         else{
@@ -178,30 +192,14 @@ public class ServerModel {
         }
     }
 
+
     private void downloadByTitleArtistYear(String music_parameters) throws ExceptionDownload {
         String [] parameter = music_parameters.split(" ");
 
         if(parameter.length == 3){
             String try_key = Music.tryKey(parameter[0],parameter[1],parameter[2]);
 
-            lock_musics.lock();
-
-            if(musics.containsKey(try_key)){
-                Music music = musics.get(try_key);
-
-                music.lockMusic();
-                lock_musics.unlock();
-
-                /*
-                  AQUI FICA O METODO RESPONSAVEL POR COPIAR O FICHEIRO
-                 */
-
-                music.unlockMusic();
-            }
-            else {
-                lock_musics.unlock();
-                throw new ExceptionDownload("This Key Is Invalid, Check The Spelling.");
-            }
+            downloadByKey(try_key);
         }
         else{
             throw new ExceptionDownload("The Parameters Were Not Correctly Filled.");

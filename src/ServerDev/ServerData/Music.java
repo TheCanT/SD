@@ -11,18 +11,21 @@ public class Music {
     private Integer year;
 
     private Collection<String> tags;
-    private Collection<String> owners;
+
+    private String path;
+    private int readers;
 
     private ReentrantLock lock_music;
 
 
-    public Music(String title, String artist, Integer year, Collection<String> tags, Collection<String> owners) {
+    public Music(String title, String artist, Integer year, Collection<String> tags) {
         this.title = title;
         this.artist = artist;
         this.year = year;
 
+        this.readers = 0;
+
         this.setTags(tags);
-        this.setOwners(owners);
 
         this.lock_music = new ReentrantLock();
     }
@@ -39,10 +42,6 @@ public class Music {
         this.year = year;
     }
 
-    public void setOwners(Collection<String> owners) {
-        this.owners = new HashSet<>(owners);
-    }
-
     public void setTags(Collection<String> tags) {
         this.tags = new HashSet<>(tags);
     }
@@ -57,10 +56,6 @@ public class Music {
 
     public Integer getYear() {
         return year;
-    }
-
-    public Collection<String> getOwners() {
-        return new HashSet<>(owners);
     }
 
     public Collection<String> getTags() {
@@ -85,12 +80,11 @@ public class Music {
         lock_music.unlock();
     }
 
-
-    public void addOwner(String user){
-        owners.add(user);
+    public void addReader(){
+        this.readers++;
     }
 
-    public void deleteOwner(String user){
-        owners.remove(user);
+    public void takeReader(){
+        this.readers--;
     }
 }

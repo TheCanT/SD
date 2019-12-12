@@ -13,17 +13,22 @@ public class Client implements Runnable {
             PrintWriter out = new PrintWriter(s.getOutputStream());
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 
-            Scanner scan = new Scanner(System.in);//new FileReader(new File("/home/gonca/Desktop/test.mp3")));
-            String cli_ter = "";
+            Scanner scan = new Scanner(System.in);
 
-            while(scan.hasNextLine() && !cli_ter.equals("quit")){
+            String cli_ter ;
+            String server_response = "";
 
+            while(!server_response.equals("quit") && scan.hasNextLine()){
                 cli_ter = scan.nextLine();
 
                 out.println(cli_ter);
                 out.flush();
 
-                System.out.println("Resposta do ServerDev.Servidor : " + in.readLine());
+                server_response = in.readLine();
+
+                System.out.println(" --- --- "+cli_ter+" --- --- \n"
+                                         + server_response +
+                                 "\n --- --- "+cli_ter+" --- --- \n");
             }
 
             s.shutdownOutput();
