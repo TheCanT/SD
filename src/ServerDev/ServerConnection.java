@@ -69,7 +69,7 @@ public class ServerConnection implements Runnable{
             for (String tag : tags_split) tags.add(tag);
             return server_model.searchByTags(tags).toString();
         }
-        return "No Musics Found With Those Tags.";
+        return "Incorrect Input (eg. search tag1«tag2«tag3«...«tagn).";
     }
 
     public String parseInteraction(String [] splited_string, PrintWriter pw,  BufferedReader br) throws Exception {
