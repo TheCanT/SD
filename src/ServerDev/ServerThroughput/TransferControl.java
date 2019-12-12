@@ -33,6 +33,14 @@ public class TransferControl {
     }
 
 
+
+    public ReentrantLock getLockDown() {
+        return lock_down;
+    }
+
+    public ReentrantLock getLockUp() {
+        return lock_up;
+    }
     public void startDownload() throws InterruptedException {
         lock_down.lock();
 

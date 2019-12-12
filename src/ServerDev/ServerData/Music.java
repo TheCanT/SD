@@ -3,6 +3,7 @@ package ServerDev.ServerData;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Music {
@@ -12,10 +13,13 @@ public class Music {
 
     private Collection<String> tags;
 
-    private String path;
     private int readers;
+    private int downloads;
 
     private ReentrantLock lock_music;
+
+    private Condition cond_writer;
+    private boolean writer;
 
 
     public Music(String title, String artist, Integer year, Collection<String> tags) {
@@ -23,11 +27,15 @@ public class Music {
         this.artist = artist;
         this.year = year;
 
-        this.readers = 0;
-
         this.setTags(tags);
 
+        this.readers = 0;
+        this.downloads = 0;
+
         this.lock_music = new ReentrantLock();
+
+        this.cond_writer = lock_music.newCondition();
+        this.writer = false;
     }
 
     public void setTitle(String title) {
@@ -46,6 +54,14 @@ public class Music {
         this.tags = new HashSet<>(tags);
     }
 
+    public boolean getWriter() {
+        return writer;
+    }
+
+    public void swapWriterValue(){
+        this.writer = ! this.writer;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -62,7 +78,6 @@ public class Music {
         return new HashSet<>(tags);
     }
 
-
     public static String tryKey(String name, String title, String year){
         return name+year+title;
     }
@@ -70,7 +85,6 @@ public class Music {
     public String getKey(){
         return this.getArtist()+this.getYear()+this.getTitle();
     }
-
 
     public void lockMusic(){
         lock_music.lock();
@@ -86,5 +100,13 @@ public class Music {
 
     public void takeReader(){
         this.readers--;
+    }
+
+    public void incrementDownloads(){
+        this.downloads++;
+    }
+
+    public void awaitCondWriters() throws InterruptedException {
+        while(this.writer) this.cond_writer.await();
     }
 }
