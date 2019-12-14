@@ -90,11 +90,11 @@ public class ParseFich {
             donos_split = music_split[DONOS].split("»");
             donos = new HashSet<>(Arrays.asList(donos_split));
 
-            musicas.put(music_split[TITULO]+parseInt(music_split[ANO])+music_split[ARTISTA],
-                    new Music(music_split[TITULO],
-                            music_split[ARTISTA],
-                            parseInt(music_split[ANO]),
-                            etiquetas));
+            Music m = new Music(music_split[TITULO],
+                    music_split[ARTISTA],
+                    parseInt(music_split[ANO]),
+                    etiquetas);
+            musicas.put(m.getKey(),m);
         }
 
         return musicas;

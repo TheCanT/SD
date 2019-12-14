@@ -1,13 +1,12 @@
 package ServerDev;
 
 
-import Exceptions.ExceptionLogin;
-import Exceptions.ExceptionLogout;
-import Exceptions.ExceptionRegister;
+import Exceptions.*;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -53,13 +52,27 @@ public class ServerConnection implements Runnable{
         else throw new ExceptionRegister("Incorrect Input (eg. register username password).");
     }
 
-    private void downloadController(String[] splited_string, PrintWriter pw) {
-        // Do it when the client end is prepared
+    private void downloadController(String[] splited_string, PrintWriter pw) throws ExceptionDownload {
+        if(splited_string.length>1){
+            if(splited_string[1].equals("-key")){
+                server_model.download(splited_string[2],pw,true);
+            }
+            else{
+                server_model.download(splited_string[1],pw,false);
+            }
+        }
+        else throw new ExceptionDownload("Incorrect Input (eg. download -key music_key / " +
+                "download  music_title music_artist music_year).");
     }
 
+    private void uploadController(String[] splited_string,  BufferedReader br) throws ExceptionUpload {
+        if(splited_string.length==4){
+            server_model.upload(splited_string[1],splited_string[2],splited_string[3],
+                    Collections.singleton(splited_string[4]),br);
 
-    private void uploadController(String[] splited_string,  BufferedReader br) {
-        // Do it when the client end is prepared
+        }
+        else throw new ExceptionUpload("Incorrect Input (eg. upload music_title music_artist " +
+                "music_year tag_1«...«tag_n");
     }
 
     private String searchController(String[] splited_string) {
@@ -69,10 +82,11 @@ public class ServerConnection implements Runnable{
             for (String tag : tags_split) tags.add(tag);
             return server_model.searchByTags(tags).toString();
         }
-        return "Incorrect Input (eg. search tag1«tag2«tag3«...«tagn).";
+        return "Incorrect Input (eg. search tag_1«tag_2«tag_3«...«tag_n).";
     }
 
-    public String parseInteraction(String [] splited_string, PrintWriter pw,  BufferedReader br) throws Exception {
+    public String parseInteraction(String [] splited_string, PrintWriter pw,  BufferedReader br)
+            throws ExceptionDownload, ExceptionLogin, ExceptionRegister, ExceptionLogout, ExceptionUpload {
         switch (splited_string[0]){
             case "login":
                 loginController(splited_string);
@@ -103,12 +117,23 @@ public class ServerConnection implements Runnable{
                 return searchController(splited_string);
 
 
-            case "quit":
-                throw new Exception("quit");
+            case "upload_request":
+                return "upload_ticket_request";
 
+
+            case "download_request":
+                return "download_ticket_request";
+
+
+            case "quit":
+                return "quit";
+
+
+            case "help":
+                return "NO HELP YET";
 
             default:
-                return "FUCK: "+ Arrays.toString(splited_string);
+                return "Try The Command \"help\".";
         }
     }
 
@@ -130,7 +155,7 @@ public class ServerConnection implements Runnable{
                     interaction_output = parseInteraction(splited,out,in);
                     out.println(interaction_output);
                 }
-                catch(Exception e){
+                catch(ExceptionDownload | ExceptionLogin | ExceptionRegister | ExceptionLogout | ExceptionUpload e){
                     out.println(e.getMessage());
                 }
                 out.flush();

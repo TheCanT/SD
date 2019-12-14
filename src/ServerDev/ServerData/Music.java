@@ -78,12 +78,12 @@ public class Music {
         return new HashSet<>(tags);
     }
 
-    public static String tryKey(String name, String title, String year){
-        return name+year+title;
+    public static String tryKey(String title, String artist, String year){
+        return title+year+artist;
     }
 
     public String getKey(){
-        return this.getArtist()+this.getYear()+this.getTitle();
+        return this.getTitle()+this.getYear()+this.getArtist();
     }
 
     public void lockMusic(){

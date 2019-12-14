@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ServerModel {
-    private static final String PATH_SERVER_MUSICS = "/home/gonca/Desktop/file_share/";
+    private static final String PATH_SERVER_MUSICS = "/home/gonca/Desktop/files_share/";
 
     private Map<String, User> users;
     private ReentrantLock lock_users;
@@ -134,21 +134,23 @@ public class ServerModel {
     private TransferControl transfer_control;
 
 
-    public void upload(String name_upload, String title_upload, String year_upload,
+    public void upload(String title_upload, String artist_upload, String year_upload,
                        Collection<String> tags_upload, BufferedReader br) throws ExceptionUpload {
         lock_musics.lock();
 
-        if(musics.containsKey(Music.tryKey(name_upload,title_upload,year_upload))){
-            Music music = musics.get(Music.tryKey(name_upload,title_upload,year_upload));
+        if(musics.containsKey(Music.tryKey(title_upload,artist_upload,year_upload))){
 
+            /*
+            Music music = musics.get(Music.tryKey(name_upload,artist_upload,year_upload));
             music.lockMusic();
-            lock_musics.unlock();
-
             music.unlockMusic();
-            throw new ExceptionUpload("This Music Already Exists, Your Account Was Added As Owner.");
+            */
+
+            lock_musics.unlock();
+            throw new ExceptionUpload("This Music Already Exists.");
         }
 
-        Music music = new Music(name_upload,title_upload,Integer.parseInt(year_upload),tags_upload);
+        Music music = new Music(artist_upload,title_upload,Integer.parseInt(year_upload),tags_upload);
 
         music.lockMusic();
 
@@ -161,16 +163,20 @@ public class ServerModel {
 
         try {
             transfer_control.startUpload(); // 1
-
-            Request ur = new Request(new BufferedWriter(new FileWriter(PATH_SERVER_MUSICS+music.getKey())),br); // 2
-            ur.transferRequest(); // 3
-
+;
+            File new_file = new File(PATH_SERVER_MUSICS + music.getKey());
+            if (new_file.createNewFile()){
+                Request ur = new Request(new BufferedWriter(new FileWriter(new_file)), br); // 2
+                ur.transferRequest(); // 3
+                System.out.println("PASSA LEL");
+            }
             transfer_control.endUpload();
         } catch (InterruptedException e) { // 1
             transfer_control.getLockUp().unlock();
             throw new ExceptionUpload("(Upload) Error On The Waiting List, Try Again.");
         } catch (IOException e) { // 2 & 3
             transfer_control.endUpload();
+            System.out.print(e.getMessage());
             throw new ExceptionUpload("(Upload) Error Occurred While Copying The File, Try Again.");
         } finally {
             lock_musics.lock();
@@ -210,6 +216,7 @@ public class ServerModel {
 
     private void downloadByKey(String music_key, PrintWriter pw) throws ExceptionDownload {
         lock_musics.lock();
+
         if(musics.containsKey(music_key)){
             Music music = musics.get(music_key);
 
