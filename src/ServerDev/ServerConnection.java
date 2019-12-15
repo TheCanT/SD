@@ -64,13 +64,6 @@ public class ServerConnection implements Runnable{
             else{
                 server_model.download(splited_string[1],pw,false,in);
             }
-
-            try {
-                out=new PrintWriter(client_socket.getOutputStream());//tryy
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
         }
         else throw new ExceptionDownload("Incorrect Input (eg. download -key music_key / " +
                 "download  music_title music_artist music_year).");
