@@ -1,5 +1,6 @@
 package ClientDev;
 
+import Exceptions.ExceptionDownload;
 import Exceptions.ExceptionUpload;
 import Requests.Request;
 
@@ -10,58 +11,86 @@ public class ClientRequest implements Runnable {
     private String string_request;
     private String path;
 
+    private BufferedReader in;
+    private PrintWriter out;
+
+
+    private BufferedWriter bw;
+    private BufferedReader br;
+
+
     public ClientRequest(String string_request, String path) {
         this.string_request = string_request;
         this.path = path;
+    }
+
+    private void downloadHandler() throws IOException {
+        bw = new BufferedWriter(new FileWriter(path));
+        br = in;
+    }
+
+    private void uploadHandler() throws FileNotFoundException {
+        bw = new BufferedWriter(out);
+        br = new BufferedReader(new FileReader(path));
+    }
+
+    private void downloadStartTransfer() throws IOException, ExceptionDownload {
+        String s = in.readLine();
+        if (!s.equals("READY")) throw new ExceptionDownload(s);
+        out.println("START");
+        out.flush();
+    }
+
+    private void uploadStartTransfer() throws IOException, ExceptionUpload {
+        out.println("READY");
+        out.flush();
+        String s = in.readLine();
+        if (!s.equals("START")) throw new ExceptionUpload (s);
     }
 
     @Override
     public void run() {
         try {
             Socket socket_request = new Socket("localhost",12345);
-            PrintWriter out = new PrintWriter(socket_request.getOutputStream());
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket_request.getInputStream()));
+            out = new PrintWriter(socket_request.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket_request.getInputStream()));
 
-
-
-            BufferedWriter bw = null;
-            BufferedReader br = null;
-
+            out.println(string_request);
+            out.flush();
 
             System.out.println("CLIENT REQUEST 1");
 
             if(string_request.startsWith("upload")){
-                bw = new BufferedWriter(out);
-                br = new BufferedReader(new FileReader(path));
-
+                uploadHandler();
+                uploadStartTransfer();
             }else
             if(string_request.startsWith("download")){
-                bw = new BufferedWriter(new FileWriter(path));
-                br = in;
+                downloadHandler();
+                downloadStartTransfer();
             }
 
             System.out.println("CLIENT REQUEST 2");
 
             Request request = new Request(bw,br);
-
-            out.println(string_request);
-            out.flush();
-
             request.transferRequest();
 
             System.out.println("CLIENT REQUEST 3");
 
-            //FECHAR O OUT PUT PARA O OUTRO NAO FICAR Á ESPERA DE ALGO.
             socket_request.shutdownOutput();
 
-            System.out.println("/\\ /\\ /\\ Your Request \""+in.readLine()+"\" Is Completed! /\\ /\\ /\\");
+            String aa = in.readLine();
+
+            System.out.println("/\\ /\\ /\\ Your Request \""+(aa==null?"DOWNLOAD" :aa )+"\" Is Completed! /\\ /\\ /\\");
 
 
             socket_request.shutdownInput();
             socket_request.close();
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+        catch (ExceptionUpload | ExceptionDownload e) {
+            System.out.println(e.getMessage());
+        }
+        catch (IOException ignored) {
         }
     }
 }

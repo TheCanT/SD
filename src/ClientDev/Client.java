@@ -35,11 +35,13 @@ public class Client{
         Scanner scan = new Scanner(System.in);
         String path = null;
 
+        File new_file = new File("/home/gonca/Downloads/"+path);
         if(scan.hasNextLine()) {
             path = scan.nextLine();
             ClientRequest r = new ClientRequest(request, "/home/gonca/Downloads/"+path);
             Thread th = new Thread(r);
             th.start();
+
         }
     }
 

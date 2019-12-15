@@ -15,6 +15,9 @@ public class ServerConnection implements Runnable{
     private ServerModel server_model;
     private String user_logged_in;
 
+    private BufferedReader in;
+    private PrintWriter out;
+
     public ServerConnection(Socket s, ServerModel model) {
         client_socket = s;
         server_model = model;
@@ -53,13 +56,21 @@ public class ServerConnection implements Runnable{
     }
 
     private void downloadController(String[] splited_string, PrintWriter pw) throws ExceptionDownload {
+            System.out.println(Arrays.toString(splited_string)+" -> "+splited_string.length);
         if(splited_string.length>1){
             if(splited_string[1].equals("-key")){
-                server_model.download(splited_string[2],pw,true);
+                server_model.download(splited_string[2],pw,true,in);
             }
             else{
-                server_model.download(splited_string[1],pw,false);
+                server_model.download(splited_string[1],pw,false,in);
             }
+
+            try {
+                out=new PrintWriter(client_socket.getOutputStream());//tryy
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
         else throw new ExceptionDownload("Incorrect Input (eg. download -key music_key / " +
                 "download  music_title music_artist music_year).");
@@ -67,9 +78,19 @@ public class ServerConnection implements Runnable{
 
     private void uploadController(String[] splited_string,  BufferedReader br) throws ExceptionUpload {
         if(splited_string.length==5){
-            server_model.upload(splited_string[1],splited_string[2],splited_string[3],
-                    Collections.singleton(splited_string[4]),br);
 
+
+            try {
+                String s = in.readLine();
+                if (!s.equals("READY")) throw new ExceptionUpload(s);
+            } catch (IOException e) {
+                System.out.println("fuck upload");
+            }
+
+
+
+            server_model.upload(splited_string[1],splited_string[2],splited_string[3],
+                    Collections.singleton(splited_string[4]),br,out);
         }
         else throw new ExceptionUpload("Incorrect Input (eg. upload music_title music_artist " +
                 "music_year tag_1«...«tag_n");
@@ -139,10 +160,9 @@ public class ServerConnection implements Runnable{
 
     @Override
     public void run() {
-        BufferedReader in = null;
         try {
             in = new BufferedReader(new InputStreamReader(client_socket.getInputStream()));
-            PrintWriter out = new PrintWriter(client_socket.getOutputStream());
+            out = new PrintWriter(client_socket.getOutputStream());
             String cli_resposta;
             cli_resposta = in.readLine();
             String [] splited;
@@ -152,6 +172,7 @@ public class ServerConnection implements Runnable{
                 splited = cli_resposta.split(" ");
 
                 try{
+                    System.out.println("SConnection -> "+cli_resposta);
                     interaction_output = parseInteraction(splited,out,in);
                     out.println(interaction_output);
                 }
@@ -169,7 +190,12 @@ public class ServerConnection implements Runnable{
 
             System.out.println("CLOSE CONNECTION");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("CLOSE CONNECTION 2");
+            try {
+                client_socket.close();
+            } catch (IOException ex) {
+                System.out.println("CLOSE CONNECTION 3");
+            }
         }
 
     }
