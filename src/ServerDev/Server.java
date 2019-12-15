@@ -4,8 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server implements Runnable {
-    private String path;
+public class Server{
 
     public static void main(String[] args) {
         ServerSocket sv_socket = null;
@@ -23,12 +22,7 @@ public class Server implements Runnable {
             }
         } catch (IOException e) {
         e.printStackTrace();
-    }
-
-}
-
-    @Override
-    public void run() {
+        }
 
     }
 }
