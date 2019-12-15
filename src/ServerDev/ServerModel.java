@@ -139,7 +139,7 @@ public class ServerModel {
         lock_musics.lock();
 
         if(musics.containsKey(Music.tryKey(title_upload,artist_upload,year_upload))){
-
+            //não está a verificar os repetidos...
             /*
             Music music = musics.get(Music.tryKey(name_upload,artist_upload,year_upload));
             music.lockMusic();
@@ -150,7 +150,7 @@ public class ServerModel {
             throw new ExceptionUpload("This Music Already Exists.");
         }
 
-        Music music = new Music(artist_upload,title_upload,Integer.parseInt(year_upload),tags_upload);
+        Music music = new Music(title_upload,artist_upload,Integer.parseInt(year_upload),tags_upload);
 
         music.lockMusic();
 
@@ -161,32 +161,44 @@ public class ServerModel {
 
         music.unlockMusic();
 
+        System.out.println("MODEL 1");
+
         try {
             transfer_control.startUpload(); // 1
+            System.out.println("MODEL 2");
 ;
             File new_file = new File(PATH_SERVER_MUSICS + music.getKey());
+            System.out.println("MODEL 2.1");
             if (new_file.createNewFile()){
+                System.out.println("MODEL 2.2");
                 Request ur = new Request(new BufferedWriter(new FileWriter(new_file)), br); // 2
+                System.out.println("MODEL 2.3");
                 ur.transferRequest(); // 3
-                System.out.println("PASSA LEL");
+                System.out.println("MODEL 2.4");
             }
+
             transfer_control.endUpload();
+            System.out.println("MODEL 3");
+
         } catch (InterruptedException e) { // 1
             transfer_control.getLockUp().unlock();
+            System.out.println("MODEL EXCEPTION 1");
             throw new ExceptionUpload("(Upload) Error On The Waiting List, Try Again.");
         } catch (IOException e) { // 2 & 3
             transfer_control.endUpload();
+
             System.out.print(e.getMessage());
+            System.out.println("MODEL EXCEPTION 2");
             throw new ExceptionUpload("(Upload) Error Occurred While Copying The File, Try Again.");
-        } finally {
-            lock_musics.lock();
-            musics.remove(music.getKey());
-            lock_musics.unlock();
         }
+
+        System.out.println("MODEL 4");
 
         music.lockMusic();
         music.swapWriterValue();
         music.unlockMusic();
+        System.out.println("MODEL 5");
+
     }
 
 

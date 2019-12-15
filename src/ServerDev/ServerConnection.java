@@ -66,7 +66,7 @@ public class ServerConnection implements Runnable{
     }
 
     private void uploadController(String[] splited_string,  BufferedReader br) throws ExceptionUpload {
-        if(splited_string.length==4){
+        if(splited_string.length==5){
             server_model.upload(splited_string[1],splited_string[2],splited_string[3],
                     Collections.singleton(splited_string[4]),br);
 
@@ -79,13 +79,13 @@ public class ServerConnection implements Runnable{
         Set<String> tags = new HashSet<>();
         if(splited_string.length == 2){
             String [] tags_split = splited_string[1].split("«");
-            for (String tag : tags_split) tags.add(tag);
+            tags.addAll(Arrays.asList(tags_split));
             return server_model.searchByTags(tags).toString();
         }
         return "Incorrect Input (eg. search tag_1«tag_2«tag_3«...«tag_n).";
     }
 
-    public String parseInteraction(String [] splited_string, PrintWriter pw,  BufferedReader br)
+    private String parseInteraction(String[] splited_string, PrintWriter pw, BufferedReader br)
             throws ExceptionDownload, ExceptionLogin, ExceptionRegister, ExceptionLogout, ExceptionUpload {
         switch (splited_string[0]){
             case "login":
@@ -133,7 +133,7 @@ public class ServerConnection implements Runnable{
                 return "NO HELP YET";
 
             default:
-                return "Try The Command \"help\".";
+                return Arrays.toString(splited_string) +" -> Try The Command \"help\".";
         }
     }
 
@@ -166,6 +166,8 @@ public class ServerConnection implements Runnable{
             client_socket.shutdownInput();
             client_socket.shutdownOutput();
             client_socket.close();
+
+            System.out.println("CLOSE CONNECTION");
         } catch (IOException e) {
             e.printStackTrace();
         }

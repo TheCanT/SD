@@ -56,7 +56,7 @@ public class TransferControl {
 
         num_down--;
 
-        if (num_down<MAX_DOWN) cond_down.signalAll(); // acho que pode ser só um signal
+        if (num_down<MAX_DOWN) cond_down.signal(); // acho que pode ser só um signal
 
         lock_down.unlock();
     }
@@ -77,7 +77,7 @@ public class TransferControl {
 
         num_up--;
 
-        if (num_up<MAX_UP) cond_up.signalAll(); // acho que pode ser só um signal
+        if (num_up<MAX_UP) cond_up.signal(); // acho que pode ser só um signal
 
         lock_up.unlock();
     }
