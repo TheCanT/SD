@@ -28,7 +28,6 @@ public class ServerModel {
     }
 
     /**
-     *
      * @param user_in
      * @param pass_in
      * @throws ExceptionLogin
@@ -37,35 +36,32 @@ public class ServerModel {
 
         lock_users.lock();
 
-        if(users.containsKey(user_in)){
+        if (users.containsKey(user_in)) {
 
             User user = users.get(user_in);
 
             user.lockUser();
             lock_users.unlock();
 
-            if(user.getLogged()){
+            if (user.getLogged()) {
 
                 user.unlockUser();
                 throw new ExceptionLogin("Already Logged In.");
 
-            }
-            else{
-                if(pass_in.equals(user.getPassword())){
+            } else {
+                if (pass_in.equals(user.getPassword())) {
 
                     user.setLogged(true);
                     user.unlockUser();
 
-                }
-                else{
+                } else {
 
                     user.unlockUser();
                     throw new ExceptionLogin("Wrong Password.");
 
                 }
             }
-        }
-        else{
+        } else {
 
             lock_users.unlock();
             throw new ExceptionLogin("Account Does Not Exist.");
@@ -74,14 +70,13 @@ public class ServerModel {
     }
 
     /**
-     *
      * @param user_logged
      * @throws ExceptionLogout
      */
     public void logout(String user_logged) throws ExceptionLogout {
         lock_users.lock();
 
-        if(users.containsKey(user_logged) && users.get(user_logged).getLogged()){
+        if (users.containsKey(user_logged) && users.get(user_logged).getLogged()) {
 
             User user = users.get(user_logged);
 
@@ -89,7 +84,7 @@ public class ServerModel {
             lock_users.unlock();
 
 
-            if(user.getNumCurrentTransfers() > 0)
+            if (user.getNumCurrentTransfers() > 0)
                 throw new ExceptionLogout("You Can Not Logout With Transfers Remaining.");
 
 
@@ -97,17 +92,15 @@ public class ServerModel {
 
             user.unlockUser();
 
-        }
-        else{
+        } else {
 
             lock_users.unlock();
-            throw  new ExceptionLogout("You Are Not Logged In.");
+            throw new ExceptionLogout("You Are Not Logged In.");
 
         }
     }
 
     /**
-     *
      * @param user_reg
      * @param pass_reg
      * @throws ExceptionRegister
@@ -116,17 +109,16 @@ public class ServerModel {
 
         lock_users.lock();
 
-        if(users.containsKey(user_reg)){
+        if (users.containsKey(user_reg)) {
 
             lock_users.unlock();
             throw new ExceptionRegister("Account Already Exists.");
 
         }
 
-        users.put(user_reg,new User(user_reg,pass_reg));
+        users.put(user_reg, new User(user_reg, pass_reg));
         lock_users.unlock();
     }
-
 
 
     private Map<String, Music> musics;
@@ -138,7 +130,7 @@ public class ServerModel {
                        Collection<String> tags_upload, BufferedReader br, PrintWriter out) throws ExceptionUpload {
         lock_musics.lock();
 
-        if(musics.containsKey(Music.tryKey(title_upload,artist_upload,year_upload))){
+        if (musics.containsKey(Music.tryKey(title_upload, artist_upload, year_upload))) {
             //não está a verificar os repetidos...
             /*
             Music music = musics.get(Music.tryKey(name_upload,artist_upload,year_upload));
@@ -150,85 +142,74 @@ public class ServerModel {
             throw new ExceptionUpload("This Music Already Exists.");
         }
 
-        Music music = new Music(title_upload,artist_upload,Integer.parseInt(year_upload),tags_upload);
+        Music music = new Music(title_upload, artist_upload, Integer.parseInt(year_upload), tags_upload);
 
         music.lockMusic();
 
-        musics.put(music.getKey(),music);
+        musics.put(music.getKey(), music);
         lock_musics.unlock();
 
-        if(!music.getWriter()) music.swapWriterValue();
+        if (!music.getWriter()) music.swapWriterValue();
 
         music.unlockMusic();
 
-        System.out.println("MODEL 1");
 
         try {
             transfer_control.startUpload(); // 1
 
-            System.out.println("MODEL 2");
-;
             File new_file = new File(PATH_SERVER_MUSICS + music.getKey());
-            System.out.println("MODEL 2.1");
-            if (new_file.createNewFile()){
+
+            if (new_file.createNewFile()) {
                 out.println("START");
                 out.flush();
-                System.out.println("MODEL 2.2");
                 Request ur = new Request(new BufferedWriter(new FileWriter(new_file)), br); // 2
-                System.out.println("MODEL 2.3");
+
+
                 ur.transferRequest(); // 3
-                System.out.println("MODEL 2.4");
-            }
-            else {
+
+            } else {
                 transfer_control.endUpload();
                 throw new ExceptionUpload("The File Name Already Exists.");
             }
 
             transfer_control.endUpload();
-            System.out.println("MODEL 3");
+
 
         } catch (InterruptedException e) { // 1
             transfer_control.getLockUp().unlock();
-            System.out.println("MODEL EXCEPTION 1");
+
+            transfer_control.endUpload();
+
             throw new ExceptionUpload("(Upload) Error On The Waiting List, Try Again.");
         } catch (IOException e) { // 2 & 3
             transfer_control.endUpload();
 
-            System.out.print(e.getMessage());
-            System.out.println("MODEL EXCEPTION 2");
             throw new ExceptionUpload("(Upload) Error Occurred While Copying The File, Try Again.");
+        }finally {
+            music.lockMusic();
+            music.signalCondWriters();
+            music.unlockMusic();
         }
-
-        System.out.println("MODEL 4");
-
-        music.lockMusic();
-        music.swapWriterValue();
-        music.unlockMusic();
-        System.out.println("MODEL 5");
 
     }
 
 
-
-
     public void download(String input, PrintWriter pw, boolean download_by_key, BufferedReader in) throws ExceptionDownload {
-        if(download_by_key){
-            this.downloadByKey(input,pw,in);
-        }
-        else {
-            this.downloadByTitleArtistYear(input,pw,in);
+        if (download_by_key) {
+            this.downloadByKey(input, pw, in);
+        } else {
+            this.downloadByTitleArtistYear(input, pw, in);
         }
     }
 
     private void downloadByTitleArtistYear(String music_parameters, PrintWriter pw, BufferedReader in) throws ExceptionDownload {
-        String [] parameter = music_parameters.split("«");
+        String[] parameter = music_parameters.split("«");
 
-        if(parameter.length == 3){
-            String try_key = Music.tryKey(parameter[0],parameter[1],parameter[2]);
+        if (parameter.length == 3) {
+            String try_key = Music.tryKey(parameter[0], parameter[1], parameter[2]);
 
-            downloadByKey(try_key,pw,in);
-        }
-        else{
+            downloadByKey(try_key, pw, in);
+        } else {
             throw new ExceptionDownload("The Parameters Were Not Correctly Filled.");
         }
     }
@@ -236,7 +217,7 @@ public class ServerModel {
     private void downloadByKey(String music_key, PrintWriter pw, BufferedReader in) throws ExceptionDownload {
         lock_musics.lock();
 
-        if(musics.containsKey(music_key)){
+        if (musics.containsKey(music_key)) {
             Music music = musics.get(music_key);
 
             music.lockMusic();
@@ -254,12 +235,12 @@ public class ServerModel {
                 transfer_control.startDownload(); // 1
 
                 Request dr = new Request(new BufferedWriter(pw), new BufferedReader(
-                                                 new FileReader(PATH_SERVER_MUSICS+music_key))); // 2
+                        new FileReader(PATH_SERVER_MUSICS + music_key))); // 2
 
                 pw.println("READY");
                 pw.flush();
                 String st = in.readLine();
-                if (!st.equals("START")) throw new ExceptionDownload ("Your Client Is Not Prepared To Recieve" +
+                if (!st.equals("START")) throw new ExceptionDownload("Your Client Is Not Prepared To Recieve" +
                         " The File.");
 
                 dr.transferRequest(); // 3
@@ -283,17 +264,16 @@ public class ServerModel {
             music.takeReader();
             music.incrementDownloads();
             music.unlockMusic();
-        }
-        else{
+        } else {
             lock_musics.unlock();
             throw new ExceptionDownload("This Key Is Invalid, Check The Spelling.");
         }
     }
 
 
-    public Collection<String> searchByTags(Set<String> music_tags){
+    public Collection<String> searchByTags(Set<String> music_tags) {
         lock_musics.lock();
-        Collection<Music> musics_now =  musics.values();
+        Collection<Music> musics_now = musics.values();
         lock_musics.unlock();
 
         Collection<String> musics_with_tags = new ArrayList<>();

@@ -107,6 +107,13 @@ public class Music {
     }
 
     public void awaitCondWriters() throws InterruptedException {
-        while(this.writer) this.cond_writer.await();
+        while(this.writer){
+            this.cond_writer.await();
+        }
+    }
+
+    public void signalCondWriters(){
+        this.swapWriterValue();
+        this.cond_writer.signalAll();
     }
 }

@@ -58,8 +58,6 @@ public class ClientRequest implements Runnable {
             out.println(string_request);
             out.flush();
 
-            System.out.println("CLIENT REQUEST 1");
-
             if(string_request.startsWith("upload")){
                 uploadHandler();
                 uploadStartTransfer();
@@ -69,12 +67,9 @@ public class ClientRequest implements Runnable {
                 downloadStartTransfer();
             }
 
-            System.out.println("CLIENT REQUEST 2");
-
             Request request = new Request(bw,br);
             request.transferRequest();
 
-            System.out.println("CLIENT REQUEST 3");
 
             socket_request.shutdownOutput();
 
@@ -87,10 +82,8 @@ public class ClientRequest implements Runnable {
             socket_request.close();
 
         }
-        catch (ExceptionUpload | ExceptionDownload e) {
+        catch (IOException | ExceptionUpload | ExceptionDownload e) {
             System.out.println(e.getMessage());
-        }
-        catch (IOException ignored) {
         }
     }
 }

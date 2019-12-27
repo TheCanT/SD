@@ -75,7 +75,7 @@ public class ServerConnection implements Runnable{
 
             try {
                 String s = in.readLine();
-                if (!s.equals("READY")) throw new ExceptionUpload(s);
+                if (s!=null && !s.equals("READY")) throw new ExceptionUpload(s);
             } catch (IOException e) {
                 System.out.println("fuck upload");
             }

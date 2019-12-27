@@ -6,7 +6,7 @@ public class Request {
     private BufferedWriter bw;
     private BufferedReader br;
 
-    private static final int MAX_READ = 32;
+    private static final int MAX_READ = 1024;
     private static final int OFFSET = 0;
 
 
