@@ -2,6 +2,7 @@ package ServerDev;
 
 
 import Exceptions.*;
+import ServerDev.ServerData.ServerModel;
 
 import java.io.*;
 import java.net.Socket;
@@ -55,21 +56,21 @@ public class ServerConnection implements Runnable{
         else throw new ExceptionRegister("Incorrect Input (eg. register username password).");
     }
 
-    private void downloadController(String[] splited_string) throws ExceptionDownload {
+    private void downloadController(String[] splited_string) throws ExceptionDownload, IOException {
             System.out.println(Arrays.toString(splited_string)+" -> "+splited_string.length);
         if(splited_string.length>1){
             if(splited_string[1].equals("-key")){
-                server_model.download(splited_string[2],out,true,in);
+                server_model.download(splited_string[2],out,true,in,client_socket.getOutputStream());
             }
             else{
-                server_model.download(splited_string[1],out,false,in);
+                server_model.download(splited_string[1],out,false,in,client_socket.getOutputStream());
             }
         }
         else throw new ExceptionDownload("Incorrect Input (eg. download -key music_key / " +
                 "download  music_title«music_artist«music_year).");
     }
 
-    private void uploadController(String[] splited_string) throws ExceptionUpload {
+    private void uploadController(String[] splited_string) throws ExceptionUpload, IOException {
         if(splited_string.length==5){
 
 
@@ -83,7 +84,7 @@ public class ServerConnection implements Runnable{
 
 
             server_model.upload(splited_string[1],splited_string[2],splited_string[3],
-                    Collections.singleton(splited_string[4]),in,out);
+                    Collections.singleton(splited_string[4]),client_socket.getInputStream(),out);
         }
         else throw new ExceptionUpload("Incorrect Input (eg. upload music_title music_artist " +
                 "music_year tag_1«...«tag_n");
@@ -100,7 +101,7 @@ public class ServerConnection implements Runnable{
     }
 
     private String parseInteraction(String[] splited_string, PrintWriter pw, BufferedReader br)
-            throws ExceptionDownload, ExceptionLogin, ExceptionRegister, ExceptionLogout, ExceptionUpload {
+            throws ExceptionDownload, ExceptionLogin, ExceptionRegister, ExceptionLogout, ExceptionUpload, IOException {
         switch (splited_string[0]){
             case "login":
                 loginController(splited_string);

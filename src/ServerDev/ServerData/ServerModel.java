@@ -1,4 +1,4 @@
-package ServerDev;
+package ServerDev.ServerData;
 
 import Exceptions.*;
 import ServerDev.ServerData.Music;
@@ -127,7 +127,7 @@ public class ServerModel {
 
 
     public void upload(String title_upload, String artist_upload, String year_upload,
-                       Collection<String> tags_upload, BufferedReader br, PrintWriter out) throws ExceptionUpload {
+                       Collection<String> tags_upload, InputStream br, PrintWriter out) throws ExceptionUpload {
         lock_musics.lock();
 
         if (musics.containsKey(Music.tryKey(title_upload, artist_upload, year_upload))) {
@@ -162,7 +162,8 @@ public class ServerModel {
             if (new_file.createNewFile()) {
                 out.println("START");
                 out.flush();
-                Request ur = new Request(new BufferedWriter(new FileWriter(new_file)), br); // 2
+                Request ur = new Request(new DataOutputStream(new FileOutputStream(PATH_SERVER_MUSICS
+                        + music.getKey())),new DataInputStream(br)); // 2
 
 
                 ur.transferRequest(); // 3
@@ -194,27 +195,27 @@ public class ServerModel {
     }
 
 
-    public void download(String input, PrintWriter pw, boolean download_by_key, BufferedReader in) throws ExceptionDownload {
+    public void download(String input, PrintWriter pw, boolean download_by_key, BufferedReader in, OutputStream os) throws ExceptionDownload {
         if (download_by_key) {
-            this.downloadByKey(input, pw, in);
+            this.downloadByKey(input, pw, in, os);
         } else {
-            this.downloadByTitleArtistYear(input, pw, in);
+            this.downloadByTitleArtistYear(input, pw, in, os);
         }
     }
 
-    private void downloadByTitleArtistYear(String music_parameters, PrintWriter pw, BufferedReader in) throws ExceptionDownload {
+    private void downloadByTitleArtistYear(String music_parameters, PrintWriter pw, BufferedReader in, OutputStream os) throws ExceptionDownload {
         String[] parameter = music_parameters.split("«");
 
         if (parameter.length == 3) {
             String try_key = Music.tryKey(parameter[0], parameter[1], parameter[2]);
 
-            downloadByKey(try_key, pw, in);
+            downloadByKey(try_key, pw, in, os);
         } else {
             throw new ExceptionDownload("The Parameters Were Not Correctly Filled.");
         }
     }
 
-    private void downloadByKey(String music_key, PrintWriter pw, BufferedReader in) throws ExceptionDownload {
+    private void downloadByKey(String music_key, PrintWriter pw, BufferedReader in, OutputStream os) throws ExceptionDownload {
         lock_musics.lock();
 
         if (musics.containsKey(music_key)) {
@@ -234,8 +235,8 @@ public class ServerModel {
             try {
                 transfer_control.startDownload(); // 1
 
-                Request dr = new Request(new BufferedWriter(pw), new BufferedReader(
-                        new FileReader(PATH_SERVER_MUSICS + music_key))); // 2
+                Request dr = new Request(new DataOutputStream(os), new DataInputStream(new FileInputStream(
+                        PATH_SERVER_MUSICS + music.getKey()))); // 2
 
                 pw.println("READY");
                 pw.flush();

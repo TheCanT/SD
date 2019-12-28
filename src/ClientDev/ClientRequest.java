@@ -6,8 +6,14 @@ import Requests.Request;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 
 public class ClientRequest implements Runnable {
+    private Socket socket_request;
+
     private String string_request;
     private String path;
 
@@ -15,8 +21,8 @@ public class ClientRequest implements Runnable {
     private PrintWriter out;
 
 
-    private BufferedWriter bw;
-    private BufferedReader br;
+    private DataOutputStream bw;
+    private DataInputStream br;
 
 
     public ClientRequest(String string_request, String path) {
@@ -25,13 +31,17 @@ public class ClientRequest implements Runnable {
     }
 
     private void downloadHandler() throws IOException {
-        bw = new BufferedWriter(new FileWriter(path));
-        br = in;
+        bw = new DataOutputStream(new FileOutputStream(path));
+        br = new DataInputStream(socket_request.getInputStream());
     }
 
     private void uploadHandler() throws FileNotFoundException {
-        bw = new BufferedWriter(out);
-        br = new BufferedReader(new FileReader(path));
+        try {
+            bw = new DataOutputStream(socket_request.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        br = new DataInputStream(new FileInputStream(path));
     }
 
     private void downloadStartTransfer() throws IOException, ExceptionDownload {
@@ -50,8 +60,9 @@ public class ClientRequest implements Runnable {
 
     @Override
     public void run() {
+        String aa = null;
         try {
-            Socket socket_request = new Socket("localhost",12345);
+            socket_request = new Socket("localhost",12345);
             out = new PrintWriter(socket_request.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket_request.getInputStream()));
 
@@ -73,7 +84,8 @@ public class ClientRequest implements Runnable {
 
             socket_request.shutdownOutput();
 
-            String aa = in.readLine();
+            aa = in.readLine();
+
 
             System.out.println("/\\ /\\ /\\ Your Request \""+(aa==null?"DOWNLOAD" :aa )+"\" Is Completed! /\\ /\\ /\\");
 
@@ -82,7 +94,14 @@ public class ClientRequest implements Runnable {
             socket_request.close();
 
         }
-        catch (IOException | ExceptionUpload | ExceptionDownload e) {
+        catch ( ExceptionDownload e){
+                try
+                {
+                    Files.deleteIfExists(Paths.get(path));
+                }
+                catch(IOException ignored) { }
+        }
+        catch (IOException | ExceptionUpload e) {
             System.out.println(e.getMessage());
         }
     }

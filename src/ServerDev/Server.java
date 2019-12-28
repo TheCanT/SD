@@ -1,5 +1,7 @@
 package ServerDev;
 
+import ServerDev.ServerData.ServerModel;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;

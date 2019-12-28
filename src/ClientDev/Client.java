@@ -13,16 +13,23 @@ public class Client{
 
     private static boolean parseUserRequest(String request, PrintWriter out, BufferedReader in)
             throws ExceptionUpload, ExceptionDownload {
-        if(request.startsWith("upload")){
-            uploadRequest(request,out);
-            System.out.println("The Upload Has Started.");
-            return true;
-        }
-        if(request.startsWith("download")){
-            downloadRequest(request,in);
-            System.out.println("The Download Has Started.");
-            return true;
-        }
+        System.out.println("parse 1 ");
+            if (request.startsWith("upload")) {
+                if(!online) return true;
+                System.out.println("parse 2 ");
+                uploadRequest(request, out);
+                System.out.println("The Upload Has Started.");
+                return true;
+            }
+            if (request.startsWith("download")) {
+                if(!online) return true;
+                System.out.println("parse 4 ");
+                downloadRequest(request, in);
+                System.out.println("The Download Has Started.");
+                return true;
+            }
+
+        System.out.println("parse 3 ");
         return false;
         //return request;
     }
@@ -63,7 +70,10 @@ public class Client{
         }
     }
 
+    private static boolean online = false;
+
     public static void main(String[] args){
+
         try {
             Socket s = new Socket("localhost",12345);
 
@@ -85,10 +95,16 @@ public class Client{
                         out.println(client_request);
                         out.flush();
 
+                        System.out.println("resposne 1 ");
                         server_response = in.readLine();
+                        System.out.println("resposne 2 ");
+                        if(!online && server_response.contains("Successful")) online = true;
                         System.out.println(" --- --- --- --- --- --- --- --- \n"
                                 + server_response +
                                 "\n --- --- --- --- --- --- --- --- \n\n");
+                    }
+                    else{
+                        System.out.println("Restricted");
                     }
                 }
                 catch (ExceptionUpload | ExceptionDownload e) {
