@@ -11,9 +11,9 @@ public class Notification implements Comparable {
         return "["+time_stamp+"] : "+message;
     }
 
-    public Notification(String message, LocalDateTime time_stamp) {
+    public Notification(String message) {
         this.message = message;
-        this.time_stamp = time_stamp;
+        this.time_stamp = LocalDateTime.now();
     }
 
     public String getMessage() {

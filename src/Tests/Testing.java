@@ -13,6 +13,10 @@ import java.util.Scanner;
 public class Testing implements Runnable{
 
 
+    private  Socket sd = null;
+    public Testing(Socket s) {
+        sd = s;
+    }
 
     private static boolean parseUserRequest(String request, PrintWriter out, BufferedReader in, BufferedReader scan)
             throws ExceptionUpload, ExceptionDownload, IOException {
@@ -66,45 +70,55 @@ public class Testing implements Runnable{
         }
     }
 
+    private int k=1;
+
     @Override
     public void run() {
         try {
-            Socket s = new Socket("localhost",12345);
+            if(sd==null) sd = new Socket("localhost",12345);
+            BufferedReader in = new BufferedReader(new InputStreamReader(sd.getInputStream()));
 
-            PrintWriter out = new PrintWriter(s.getOutputStream());
-            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
 
-            BufferedReader scan = new BufferedReader(new FileReader("/home/gonca/Desktop/testing"));
+            if(k==1) {
+                PrintWriter out = new PrintWriter(sd.getOutputStream());
+                Testing l = new Testing(sd); l.k = 2; Thread y = new Thread(l); y.start();
 
-            String client_input = "  ";
-            String client_request = "  ";
-            String server_response = "null";
+                BufferedReader scan = new BufferedReader(new FileReader("/home/gonca/Desktop/testing"));
 
-            while (client_input != null && server_response !=null && !server_response.equals("quit")){
-                client_input = scan.readLine();
+                String client_input = "  ";
+                String client_request = "  ";
 
-                try {
-                    if (client_input != null&& !parseUserRequest(client_input,out,in,scan)){
-                        client_request = client_input;
-                        out.println(client_request);
-                        out.flush();
+                while (client_input != null) {
+                    client_input = scan.readLine();
 
-                        server_response = in.readLine();
-                        System.out.println(" --- --- --- --- --- --- --- --- \n"
-                                + server_response +
-                                "\n --- --- --- --- --- --- --- --- \n\n");
+                    try {
+                        if (client_input != null && !parseUserRequest(client_input, out, in, scan)) {
+                            client_request = client_input;
+                            out.println(client_request);
+                            out.flush();
+                        }
+                    } catch (ExceptionUpload | ExceptionDownload e) {
+                        System.out.println(e.getMessage());
                     }
                 }
-                catch (ExceptionUpload | ExceptionDownload e) {
-                    System.out.println(e.getMessage());
+                Thread.sleep(4000);
+                out.close();
+                in.close();
+                sd.shutdownOutput();
+                sd.shutdownInput();
+                sd.close();
+            }
+            else {
+                String server_response = "null";
+                while (server_response != null && !server_response.equals("quit")) {
+                    server_response = in.readLine();
+                    System.out.println(" --- --- --- --- --- --- --- --- \n"
+                            + server_response +
+                            "\n --- --- --- --- --- --- --- --- \n\n");
                 }
             }
 
-            s.shutdownOutput();
-            s.shutdownInput();
-            s.close();
-
-        } catch (IOException ignore) {
+        } catch (IOException | InterruptedException ignore) {
 
         }
     }
@@ -112,8 +126,8 @@ public class Testing implements Runnable{
     public static void main(String[] args) {
         List<Thread> ths = new ArrayList<>();
 
-        for (int i = 0; i < 5; i++) {
-            ths.add(new Thread(new Testing()));
+        for (int i = 0; i < 10; i++) {
+            ths.add(new Thread(new Testing(null)));
         }
 
         for (Thread  th : ths) th.start();
@@ -126,5 +140,7 @@ public class Testing implements Runnable{
             }
         }
     }
-
+/*
+NAO SEI PORQUE MAS OS DOWNLOADS NESTA CLASSE DE TESTA NAO FUNFA
+ */
 }

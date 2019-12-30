@@ -1,4 +1,4 @@
-package ServerDev.ServerData;
+package ServerDev;
 
 import Exceptions.*;
 import ServerDev.ServerData.Music;
@@ -131,13 +131,6 @@ public class ServerModel {
         lock_musics.lock();
 
         if (musics.containsKey(Music.tryKey(title_upload, artist_upload, year_upload))) {
-            //não está a verificar os repetidos...
-            /*
-            Music music = musics.get(Music.tryKey(name_upload,artist_upload,year_upload));
-            music.lockMusic();
-            music.unlockMusic();
-            */
-
             lock_musics.unlock();
             throw new ExceptionUpload("This Music Already Exists.");
         }
@@ -172,7 +165,6 @@ public class ServerModel {
                 transfer_control.endUpload();
                 throw new ExceptionUpload("The File Name Already Exists.");
             }
-
             transfer_control.endUpload();
 
 
@@ -184,14 +176,12 @@ public class ServerModel {
             throw new ExceptionUpload("(Upload) Error On The Waiting List, Try Again.");
         } catch (IOException e) { // 2 & 3
             transfer_control.endUpload();
-
             throw new ExceptionUpload("(Upload) Error Occurred While Copying The File, Try Again.");
         }finally {
             music.lockMusic();
             music.signalCondWriters();
             music.unlockMusic();
         }
-
     }
 
 

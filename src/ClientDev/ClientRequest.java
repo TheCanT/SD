@@ -81,12 +81,15 @@ public class ClientRequest implements Runnable {
             Request request = new Request(bw,br);
             request.transferRequest();
 
+            System.out.println("kkk 1");
 
             socket_request.shutdownOutput();
 
+            System.out.println("kkk 2");
+
             aa = in.readLine();
 
-
+            System.out.println("kkk 3");
             System.out.println("/\\ /\\ /\\ Your Request \""+(aa==null?"DOWNLOAD" :aa )+"\" Is Completed! /\\ /\\ /\\");
 
 
@@ -102,6 +105,8 @@ public class ClientRequest implements Runnable {
                 catch(IOException ignored) { }
         }
         catch (IOException | ExceptionUpload e) {
+            out.println(e.getMessage());
+            out.flush();
             System.out.println(e.getMessage());
         }
     }
