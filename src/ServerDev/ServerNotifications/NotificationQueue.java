@@ -46,8 +46,6 @@ public class NotificationQueue{
 
         int size_queue = queue.size();
 
-        System.out.println("added to queue");
-
         boolean bool;
         do{
             bool = queue.offer(n);
@@ -121,12 +119,8 @@ public class NotificationQueue{
     private void queueIsEmpty(){
         while(queue.size() < 1) {
             try {
-                System.out.println("notify empty");
                 queue_is_empty.await();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
+            } catch (InterruptedException ignore) {}
         }
     }
 
@@ -137,9 +131,7 @@ public class NotificationQueue{
             try {
                 queue_is_full.await();
                 bool = false;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            } catch (InterruptedException ignore) {}
         }
         this.num_isFull_waiting--;
     }

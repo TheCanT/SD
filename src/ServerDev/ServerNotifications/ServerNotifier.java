@@ -40,9 +40,7 @@ public class ServerNotifier implements Runnable{
 
     public void run() {
         while(true){
-            System.out.println("ola 1");
             Notification not = nextNotification();
-            System.out.println("ola 2");
             lock_clients.lock();
             for(PrintWriter client : clients){
                 client.println("Notification >>> "+not.toString());

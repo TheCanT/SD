@@ -80,6 +80,9 @@ public class ClientOut implements Runnable {
         String client_input;
         String client_request;
 
+        out.println("notify");
+        out.flush();
+
         while(scan.hasNextLine()){
             client_input = scan.nextLine();
 

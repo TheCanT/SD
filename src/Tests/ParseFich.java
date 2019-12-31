@@ -1,4 +1,7 @@
-package ServerDev.ServerData;
+package Tests;
+
+import ServerDev.ServerData.Music;
+import ServerDev.ServerData.User;
 
 import java.io.*;
 import java.nio.file.Files;

@@ -54,9 +54,9 @@ public class TransferControl {
     public void endDownload() {
         lock_down.lock();
 
-        num_down--;
+        if (!(num_down<MAX_DOWN)) cond_down.signal(); // acho que pode ser só um signal
 
-        if (num_down<MAX_DOWN) cond_down.signal(); // acho que pode ser só um signal
+        num_down--;
 
         lock_down.unlock();
     }
@@ -75,9 +75,9 @@ public class TransferControl {
     public void endUpload() {
         lock_up.lock();
 
-        num_up--;
+        if (!(num_up<MAX_UP)) cond_up.signal(); // acho que pode ser só um signal
 
-        if (num_up<MAX_UP) cond_up.signal(); // acho que pode ser só um signal
+        num_up--;
 
         lock_up.unlock();
     }

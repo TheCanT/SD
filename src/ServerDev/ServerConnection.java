@@ -65,7 +65,6 @@ public class ServerConnection implements Runnable{
     }
 
     private void downloadController(String[] splited_string) throws ExceptionDownload, IOException {
-            System.out.println(Arrays.toString(splited_string)+" -> "+splited_string.length);
         if(splited_string.length>1){
             if(splited_string[1].equals("-key")){
                 server_model.download(splited_string[2],out,true,in,client_socket.getOutputStream());
@@ -82,9 +81,9 @@ public class ServerConnection implements Runnable{
         if(splited_string.length==5){
             try {
                 String s = in.readLine();
-                if (s!=null && !s.equals("READY")) throw new ExceptionUpload("lol era isto" + s);
+                if (s!=null && !s.equals("READY")) throw new ExceptionUpload("Error Upload (code:1)" + s);
             } catch (IOException e) {
-                System.out.println("fuck upload");
+                throw new ExceptionUpload("Error Upload (code:2)");
             }
             server_model.upload(splited_string[1],splited_string[2],splited_string[3],
                     Collections.singleton(splited_string[4]),client_socket.getInputStream(),out);
@@ -101,10 +100,6 @@ public class ServerConnection implements Runnable{
             return server_model.searchByTags(tags).toString();
         }
         return "Incorrect Input (eg. search tag_1«tag_2«tag_3«...«tag_n).";
-    }
-
-    private void notifierController() {
-
     }
 
     private String parseInteraction(String[] splited_string)
@@ -130,7 +125,6 @@ public class ServerConnection implements Runnable{
                 server_notifier.addNotification(new Notification("Music uploaded, " + splited_string[2]
                         + " - " + splited_string[1]+ " ("+ splited_string[3]+"), With tags: "
                         + Collections.singleton(splited_string[4])));
-                System.out.println("connect 1");
                 return "Upload Completed.";
 
 
@@ -143,8 +137,8 @@ public class ServerConnection implements Runnable{
                 return searchController(splited_string);
 
 
-            case "notifier":
-                notifierController();
+            case "notify":
+                server_notifier.addClientNotifier(out);
                 return "You Will Be Notified With The Latest Updates.";
 
 
@@ -165,11 +159,11 @@ public class ServerConnection implements Runnable{
         try {
             in = new BufferedReader(new InputStreamReader(client_socket.getInputStream()));
             out = new PrintWriter(client_socket.getOutputStream());
-            server_notifier.addClientNotifier(out);
             String cli_resposta;
-            cli_resposta = in.readLine();
             String [] splited;
             String interaction_output;
+
+            cli_resposta = in.readLine();
 
             while (cli_resposta!= null){
                 splited = cli_resposta.split(" ");

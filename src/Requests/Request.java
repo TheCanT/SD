@@ -3,20 +3,6 @@ package Requests;
 import java.io.*;
 
 public class Request {
-    /*
-      double nosofpackets=Math.ceil(((int) file.length())/packetSize);
-                         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-                         double i;
-                         for (i = 0; i < nosofpackets+1; ++i)
-                         {
-                            byte[] mybytearray = new byte[1024];
-                            bis.read(mybytearray, 0, mybytearray.length);
-                            Log.d("", "Packet:"+(i+1));
-                            OutputStream os = socket.getOutputStream();
-                            os.write(mybytearray, 0,mybytearray.length);
-                            os.flush();
-                         }
-     */
     private DataOutputStream bw;
     private DataInputStream br;
 
