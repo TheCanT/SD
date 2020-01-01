@@ -24,7 +24,7 @@ public class ServerModel {
 
         this.musics = ParseFich.loadMusicas("/home/gonca/Desktop/test_music");
         this.lock_musics = new ReentrantLock();
-        this.transfer_control = new TransferControl();
+        this.transfer_control = new TransferControl(1,1);
     }
 
     /**

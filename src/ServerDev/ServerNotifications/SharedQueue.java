@@ -5,43 +5,24 @@ import java.util.Queue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class NotificationQueue{
-    private Queue<Notification> queue;
-
+public class SharedQueue<E> {
+    private Queue<E> queue;
     private ReentrantLock queue_lock;
-
     private Condition queue_is_empty;
     private Condition queue_is_full;
-
     private int num_isFull_waiting;
 
-    public NotificationQueue() {
-        this.queue = new PriorityQueue<>();
+
+    public SharedQueue() {
+        this.queue = new PriorityQueue<E>();
         this.queue_lock = new ReentrantLock();
         this.queue_is_empty = queue_lock.newCondition();
         this.queue_is_full = queue_lock.newCondition();
         this.num_isFull_waiting = 0;
     }
 
-    public boolean addNotification(Notification n) {
-        this.queue_lock.lock();
 
-        int size_queue = queue.size();
-
-        boolean bool;
-        do{
-            bool = queue.add(n);
-            this.queueIsFull(!bool);
-        } while(!bool);
-
-        if(size_queue == 0) queue_is_empty.signal();
-
-        this.queue_lock.unlock();
-        return bool;
-    }
-
-
-    public boolean offerNotification(Notification n) {
+    public boolean offer(E n) {
         this.queue_lock.lock();
 
         int size_queue = queue.size();
@@ -52,7 +33,6 @@ public class NotificationQueue{
             this.queueIsFull(!bool);
         } while(!bool);
 
-
         if(size_queue == 0) queue_is_empty.signal();
 
         this.queue_lock.unlock();
@@ -60,54 +40,13 @@ public class NotificationQueue{
     }
 
 
-    public Notification removeNotification() {
+    public E poll() {
         this.queue_lock.lock();
 
+        System.out.println(queue.size() + " SIZE");
         this.queueIsEmpty();
 
-        Notification n = queue.remove();
-
-        if(num_isFull_waiting > 0) queue_is_full.signal();
-
-        this.queue_lock.unlock();
-        return n;
-    }
-
-
-    public Notification pollNotification() {
-        this.queue_lock.lock();
-
-        this.queueIsEmpty();
-
-        Notification n = queue.poll();
-
-        if(num_isFull_waiting > 0) queue_is_full.signal();
-
-        this.queue_lock.unlock();
-        return n;
-    }
-
-
-    public Notification elementNotification() {
-        this.queue_lock.lock();
-
-        this.queueIsEmpty();
-
-        Notification n = queue.element();
-
-        if(num_isFull_waiting > 0) queue_is_full.signal();
-
-        this.queue_lock.unlock();
-        return n;
-    }
-
-
-    public Notification peekNotification() {
-        this.queue_lock.lock();
-
-        this.queueIsEmpty();
-
-        Notification n = queue.peek();
+        E n = queue.poll();
 
         if(num_isFull_waiting > 0) queue_is_full.signal();
 
@@ -134,5 +73,65 @@ public class NotificationQueue{
             } catch (InterruptedException ignore) {}
         }
         this.num_isFull_waiting--;
+    }
+
+
+    public boolean add(E n) {
+        this.queue_lock.lock();
+
+        int size_queue = queue.size();
+
+        boolean bool;
+        do{
+            bool = queue.add(n);
+            this.queueIsFull(!bool);
+        } while(!bool);
+
+        if(size_queue == 0) queue_is_empty.signal();
+
+        this.queue_lock.unlock();
+        return bool;
+    }
+
+
+    public E remove() {
+        this.queue_lock.lock();
+
+        this.queueIsEmpty();
+
+        E n = queue.remove();
+
+        if(num_isFull_waiting > 0) queue_is_full.signal();
+
+        this.queue_lock.unlock();
+        return n;
+    }
+
+
+    public E element() {
+        this.queue_lock.lock();
+
+        this.queueIsEmpty();
+
+        E n = queue.element();
+
+        if(num_isFull_waiting > 0) queue_is_full.signal();
+
+        this.queue_lock.unlock();
+        return n;
+    }
+
+
+    public E peek() {
+        this.queue_lock.lock();
+
+        this.queueIsEmpty();
+
+        E n = queue.peek();
+
+        if(num_isFull_waiting > 0) queue_is_full.signal();
+
+        this.queue_lock.unlock();
+        return n;
     }
 }

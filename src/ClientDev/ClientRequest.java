@@ -6,12 +6,11 @@ import Requests.Request;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 
-public class ClientRequest implements Runnable {
+public class ClientRequest implements Runnable,Comparable {
     private Socket socket_request;
 
     private String string_request;
@@ -20,14 +19,16 @@ public class ClientRequest implements Runnable {
     private BufferedReader in;
     private PrintWriter out;
 
-
     private DataOutputStream bw;
     private DataInputStream br;
+
+    private LocalDateTime time_stamp;
 
 
     public ClientRequest(String string_request, String path) {
         this.string_request = string_request;
         this.path = path;
+        this.time_stamp = LocalDateTime.now();
     }
 
     private void downloadHandler() throws IOException {
@@ -58,8 +59,19 @@ public class ClientRequest implements Runnable {
         if (!s.equals("START")) throw new ExceptionUpload (s);
     }
 
+    public LocalDateTime getTimeStamp() {
+        return time_stamp;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        ClientRequest other = (ClientRequest) o;
+        return this.getTimeStamp().compareTo(other.getTimeStamp());
+    }
+
     @Override
     public void run() {
+        System.out.println("STARTED : "+string_request);
         String aa = null;
         try {
             socket_request = new Socket("localhost",12345);
@@ -81,15 +93,11 @@ public class ClientRequest implements Runnable {
             Request request = new Request(bw,br);
             request.transferRequest();
 
-            System.out.println("kkk 1");
 
             socket_request.shutdownOutput();
 
-            System.out.println("kkk 2");
-
             aa = in.readLine();
 
-            System.out.println("kkk 3");
             System.out.println("/\\ /\\ /\\ Your Request \""+(aa==null?"DOWNLOAD" :aa )+"\" Is Completed! /\\ /\\ /\\");
 
 
@@ -108,6 +116,10 @@ public class ClientRequest implements Runnable {
             out.println(e.getMessage());
             out.flush();
             System.out.println(e.getMessage());
+        }
+        finally {
+
+            System.out.println("ENDED : "+string_request);
         }
     }
 }

@@ -1,6 +1,7 @@
 package ServerDev;
 
-import ServerDev.ServerNotifications.NotificationQueue;
+import ServerDev.ServerNotifications.SharedQueue;
+import ServerDev.ServerNotifications.Notification;
 import ServerDev.ServerNotifications.ServerNotifier;
 
 import java.io.*;
@@ -16,7 +17,7 @@ public class Server{
         ServerNotifier sv_notifier = null;
         try {
             sv_socket = new ServerSocket(12345);
-            sv_notifier = new ServerNotifier(new NotificationQueue());
+            sv_notifier = new ServerNotifier(new SharedQueue<Notification>());
             sv_model = new ServerModel();
             Thread th_notifier = new Thread(sv_notifier);
             th_notifier.setPriority(Thread.MIN_PRIORITY);

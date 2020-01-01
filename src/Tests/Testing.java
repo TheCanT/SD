@@ -1,6 +1,8 @@
 package Tests;
 
+import ClientDev.ClientDownloadManager;
 import ClientDev.ClientRequest;
+import ClientDev.ClientUploadManager;
 import Exceptions.ExceptionDownload;
 import Exceptions.ExceptionUpload;
 
@@ -14,9 +16,17 @@ public class Testing implements Runnable{
 
     private  Socket sd = null;
     private int id;
+
+
+    private ClientDownloadManager cdm;
+    private ClientUploadManager cum;
+
     public Testing(Socket s, int i) {
         sd = s;
         id = i;
+
+        this.cdm = new ClientDownloadManager();
+        this.cum = new ClientUploadManager();
     }
 
     private boolean parseUserRequest(String request, PrintWriter out, BufferedReader in, BufferedReader scan)
@@ -46,9 +56,8 @@ public class Testing implements Runnable{
             path = scan.readLine();
         if(path.length()>0) {
             ClientRequest r = new ClientRequest(request, "/home/gonca/Downloads/"+path+"_"+this.id);
-            Thread th = new Thread(r);
-            th.start();
 
+            cdm.addDownloadRequest(r);
         }
     }
 
@@ -60,13 +69,12 @@ public class Testing implements Runnable{
        // Scanner scan = new Scanner(scan);
         String path = null;
 
-                path = scan.readLine();
+        path = scan.readLine();
         if(path.length()>0){
 
             ClientRequest r = new ClientRequest(request,path);
 
-            Thread th = new Thread(r);
-            th.start();
+            cum.addUploadRequest(r);
         }
     }
 
@@ -74,6 +82,12 @@ public class Testing implements Runnable{
 
     @Override
     public void run() {
+        Thread th_cdm = new Thread(this.cdm);
+        Thread th_cum = new Thread(this.cum);
+
+        th_cdm.start();
+        th_cum.start();
+
         try {
             if(sd==null) sd = new Socket("localhost",12345);
             BufferedReader in = new BufferedReader(new InputStreamReader(sd.getInputStream()));
@@ -132,7 +146,7 @@ public class Testing implements Runnable{
     public static void main(String[] args) {
         List<Thread> ths = new ArrayList<>();
 
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 10; i++) {
             ths.add(new Thread(new Testing(null,i)));
         }
 

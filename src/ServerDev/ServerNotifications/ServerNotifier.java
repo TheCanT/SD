@@ -6,24 +6,23 @@ import java.util.Collection;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ServerNotifier implements Runnable{
-    private NotificationQueue notifications;
-    private Collection<PrintWriter> clients;
+    private SharedQueue<Notification> notifications;
 
+    private Collection<PrintWriter> clients;
     private ReentrantLock lock_clients;
 
-    public ServerNotifier(NotificationQueue notifications) {
+    public ServerNotifier(SharedQueue<Notification> notifications) {
         this.notifications = notifications;
         this.clients = new ArrayList<>();
         lock_clients = new ReentrantLock();
     }
 
     public void addNotification(Notification n){
-        notifications.offerNotification(n);
+        notifications.offer(n);
     }
 
     private Notification nextNotification(){
-        Notification n = notifications.pollNotification();
-        return n;
+        return notifications.poll();
     }
 
     public void removeClientNotifier(PrintWriter out){
