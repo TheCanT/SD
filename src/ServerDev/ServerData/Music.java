@@ -12,7 +12,6 @@ public class Music {
 
     private Collection<String> tags;
 
-    private int readers;
     private int downloads;
 
     private ReentrantLock lock_music;
@@ -28,7 +27,6 @@ public class Music {
 
         this.setTags(tags);
 
-        this.readers = 0;
         this.downloads = 0;
 
         this.lock_music = new ReentrantLock();
@@ -65,6 +63,10 @@ public class Music {
         return title;
     }
 
+    public int getDownloads() {
+        return downloads;
+    }
+
     public String getArtist() {
         return artist;
     }
@@ -91,14 +93,6 @@ public class Music {
 
     public void unlockMusic(){
         lock_music.unlock();
-    }
-
-    public void addReader(){
-        this.readers++;
-    }
-
-    public void takeReader(){
-        this.readers--;
     }
 
     public void incrementDownloads(){

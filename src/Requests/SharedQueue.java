@@ -1,4 +1,4 @@
-package ServerDev.ServerNotifications;
+package Requests;
 
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -43,7 +43,6 @@ public class SharedQueue<E> {
     public E poll() {
         this.queue_lock.lock();
 
-        System.out.println(queue.size() + " SIZE");
         this.queueIsEmpty();
 
         E n = queue.poll();

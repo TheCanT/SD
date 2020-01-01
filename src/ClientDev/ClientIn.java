@@ -7,16 +7,16 @@ public class ClientIn implements Runnable {
     private BufferedReader in;
     private boolean online;
 
-    public ClientIn(BufferedReader in) {
+    ClientIn(BufferedReader in) {
         this.in = in;
-        online = false;
+        this.online = false;
     }
 
-    public synchronized boolean isOnline() {
+    synchronized boolean isOnline() {
         return online;
     }
 
-    public synchronized void setOnline(boolean online) {
+    private synchronized void setOnline(boolean online) {
         this.online = online;
     }
 

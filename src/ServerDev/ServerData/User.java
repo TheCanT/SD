@@ -11,9 +11,6 @@ public class User {
 
     private ReentrantLock lock;
 
-    private int upload;
-    private int download;
-
     public User(String name, String pass){
         username = name;
         password = pass;
@@ -21,26 +18,6 @@ public class User {
         logged = false;
 
         lock = new ReentrantLock();
-
-        upload = 0;
-        download = 0;
-    }
-
-
-    public int getUpload() {
-        return upload;
-    }
-
-    public int getDownload() {
-        return download;
-    }
-
-    public void setDownload(int download) {
-        this.download = download;
-    }
-
-    public void setUpload(int upload) {
-        this.upload = upload;
     }
 
     public String getUsername() {
@@ -74,9 +51,4 @@ public class User {
     public void unlockUser(){
         lock.unlock();
     }
-
-    public int getNumCurrentTransfers(){
-        return upload+download;
-    }
-
 }

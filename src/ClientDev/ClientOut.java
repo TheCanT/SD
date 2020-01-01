@@ -1,6 +1,5 @@
 package ClientDev;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.util.Scanner;
 
@@ -8,21 +7,21 @@ public class ClientOut implements Runnable {
     private PrintWriter out;
     private ClientIn ci;
 
-    private ClientDownloadManager cdm;
-    private ClientUploadManager cum;
+    private ClientTransferManager<ClientRequest> cdm;
+    private ClientTransferManager<ClientRequest> cum;
 
-    public ClientOut(PrintWriter out, ClientIn ci) {
+    ClientOut(PrintWriter out, ClientIn ci) {
         this.out = out;
         this.ci = ci;
 
-        this.cdm = new ClientDownloadManager();
-        this.cum = new ClientUploadManager();
+        this.cdm = new ClientTransferManager<>();
+        this.cum = new ClientTransferManager<>();
     }
 
     private boolean parseUserRequest(String request) {
         if (request.startsWith("upload")) {
             if(!ci.isOnline()) {
-                System.out.println("You Must Be Logged In To Do Uploads/Downloads.");
+                System.out.println("You Must Be Logged In To Do Uploads.");
                 return true;
             }
             uploadRequest(request);
@@ -31,7 +30,7 @@ public class ClientOut implements Runnable {
         }
         if (request.startsWith("download")) {
             if(!ci.isOnline()) {
-                System.out.println("You Must Be Logged In To Do Uploads/Downloads.");
+                System.out.println("You Must Be Logged In To Do Downloads.");
                 return true;
             }
             downloadRequest(request);
@@ -48,17 +47,12 @@ public class ClientOut implements Runnable {
         Scanner scan = new Scanner(System.in);
         String path = null;
 
-        File new_file = new File("/home/gonca/Downloads/"+path);
         if(scan.hasNextLine()) {
             path = scan.nextLine();
 
             ClientRequest r = new ClientRequest(request, "/home/gonca/Downloads/"+path);
 
-            cdm.addDownloadRequest(r);
-            /*
-            Thread th = new Thread(r);
-            th.start();
-            */
+            cdm.addTransferRequest(r);
         }
     }
 
@@ -74,11 +68,7 @@ public class ClientOut implements Runnable {
 
             ClientRequest r = new ClientRequest(request,path);
 
-            cum.addUploadRequest(r);
-            /*
-            Thread th = new Thread(r);
-            th.start();
-             */
+            cum.addTransferRequest(r);
         }
     }
 

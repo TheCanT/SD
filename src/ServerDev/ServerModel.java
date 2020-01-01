@@ -11,14 +11,14 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class ServerModel {
+class ServerModel {
     private static final String PATH_SERVER_MUSICS = "/home/gonca/Desktop/files_share/";
 
     private Map<String, User> users;
     private ReentrantLock lock_users;
 
 
-    public ServerModel() throws IOException {
+    ServerModel() throws IOException {
         this.users = ParseFich.loadUsers("/home/gonca/Desktop/test_user");
         this.lock_users = new ReentrantLock();
 
@@ -27,12 +27,7 @@ public class ServerModel {
         this.transfer_control = new TransferControl(1,1);
     }
 
-    /**
-     * @param user_in
-     * @param pass_in
-     * @throws ExceptionLogin
-     */
-    public void login(String user_in, String pass_in) throws ExceptionLogin {
+    void login(String user_in, String pass_in) throws ExceptionLogin {
 
         lock_users.lock();
 
@@ -69,11 +64,7 @@ public class ServerModel {
         }
     }
 
-    /**
-     * @param user_logged
-     * @throws ExceptionLogout
-     */
-    public void logout(String user_logged) throws ExceptionLogout {
+    void logout(String user_logged) throws ExceptionLogout {
         lock_users.lock();
 
         if (users.containsKey(user_logged) && users.get(user_logged).getLogged()) {
@@ -83,9 +74,10 @@ public class ServerModel {
             user.lockUser();
             lock_users.unlock();
 
-
+/*
             if (user.getNumCurrentTransfers() > 0)
                 throw new ExceptionLogout("You Can Not Logout With Transfers Remaining.");
+ */
 
 
             user.setLogged(false);
@@ -100,12 +92,7 @@ public class ServerModel {
         }
     }
 
-    /**
-     * @param user_reg
-     * @param pass_reg
-     * @throws ExceptionRegister
-     */
-    public void register(String user_reg, String pass_reg) throws ExceptionRegister {
+    void register(String user_reg, String pass_reg) throws ExceptionRegister {
 
         lock_users.lock();
 
@@ -126,8 +113,8 @@ public class ServerModel {
     private TransferControl transfer_control;
 
 
-    public void upload(String title_upload, String artist_upload, String year_upload,
-                       Collection<String> tags_upload, InputStream br, PrintWriter out) throws ExceptionUpload {
+    void upload(String title_upload, String artist_upload, String year_upload,
+                Collection<String> tags_upload, InputStream br, PrintWriter out) throws ExceptionUpload {
         lock_musics.lock();
 
         if (musics.containsKey(Music.tryKey(title_upload, artist_upload, year_upload))) {
@@ -185,7 +172,7 @@ public class ServerModel {
     }
 
 
-    public void download(String input, PrintWriter pw, boolean download_by_key, BufferedReader in, OutputStream os) throws ExceptionDownload {
+    void download(String input, PrintWriter pw, boolean download_by_key, BufferedReader in, OutputStream os) throws ExceptionDownload {
         if (download_by_key) {
             this.downloadByKey(input, pw, in, os);
         } else {
@@ -215,7 +202,6 @@ public class ServerModel {
             lock_musics.unlock();
             try {
                 music.awaitCondWriters();
-                music.addReader();
                 music.unlockMusic();
             } catch (InterruptedException e) {
                 music.unlockMusic();
@@ -252,7 +238,6 @@ public class ServerModel {
             }
 
             music.lockMusic();
-            music.takeReader();
             music.incrementDownloads();
             music.unlockMusic();
         } else {
@@ -262,7 +247,7 @@ public class ServerModel {
     }
 
 
-    public Collection<String> searchByTags(Set<String> music_tags) {
+    Collection<String> searchByTags(Set<String> music_tags) {
         lock_musics.lock();
         Collection<Music> musics_now = musics.values();
         lock_musics.unlock();
@@ -273,7 +258,7 @@ public class ServerModel {
             m.lockMusic();
             for(String tag : m.getTags())
                 if(music_tags.contains(tag))
-                    musics_with_tags.add(m.getKey()+" : "+m.getArtist()+" - "+m.getTitle()+" - "+m.getYear());
+                    musics_with_tags.add(m.getKey()+" : "+m.getArtist()+" - "+m.getTitle()+" - ("+m.getYear()+") - ["+m.getDownloads()+"]");
             m.unlockMusic();
         }
 
@@ -281,25 +266,4 @@ public class ServerModel {
     }
 
 
-    /*
-    public void searchByPopularity(){
-
-    }
-
-    public void searchByKey(String music_key){
-
-    }
-
-    public void searchByTitle(String music_title){
-
-    }
-
-    public void searchByAno(String music_year){
-
-    }
-
-    public void searchByArtist(String music_artist){
-
-    }
-     */
 }

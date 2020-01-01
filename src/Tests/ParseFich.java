@@ -30,7 +30,7 @@ public class ParseFich {
 
 
 
-    public static void saveUsers(Map<String, User> users, String path) throws IOException {
+    private static void saveUsers(Map<String, User> users, String path) throws IOException {
         PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(path)));
 
         for(User user : users.values()){
@@ -56,7 +56,7 @@ public class ParseFich {
     }
 
 
-    public static void saveMusicas(Map<String, Music> musicas, String path) throws IOException {
+    private static void saveMusicas(Map<String, Music> musicas, String path) throws IOException {
         PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(path)));
         StringBuilder sb = null;
 

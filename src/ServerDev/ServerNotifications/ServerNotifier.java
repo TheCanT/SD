@@ -1,5 +1,7 @@
 package ServerDev.ServerNotifications;
 
+import Requests.SharedQueue;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,8 +44,10 @@ public class ServerNotifier implements Runnable{
             Notification not = nextNotification();
             lock_clients.lock();
             for(PrintWriter client : clients){
-                client.println("Notification >>> "+not.toString());
-                client.flush();
+                synchronized (client) {
+                    client.println("Notification >>> " + not.toString());
+                    client.flush();
+                }
             }
             lock_clients.unlock();
         }

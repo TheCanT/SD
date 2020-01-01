@@ -59,7 +59,7 @@ public class ClientRequest implements Runnable,Comparable {
         if (!s.equals("START")) throw new ExceptionUpload (s);
     }
 
-    public LocalDateTime getTimeStamp() {
+    private LocalDateTime getTimeStamp() {
         return time_stamp;
     }
 
@@ -71,7 +71,6 @@ public class ClientRequest implements Runnable,Comparable {
 
     @Override
     public void run() {
-        System.out.println("STARTED : "+string_request);
         String aa = null;
         try {
             socket_request = new Socket("localhost",12345);
@@ -106,20 +105,17 @@ public class ClientRequest implements Runnable,Comparable {
 
         }
         catch ( ExceptionDownload e){
-                try
-                {
-                    Files.deleteIfExists(Paths.get(path));
-                }
-                catch(IOException ignored) { }
+            out.println(e.getMessage());
+            out.flush();
+            try
+            {
+                Files.deleteIfExists(Paths.get(path));
+            }
+            catch(IOException ignored) { }
         }
         catch (IOException | ExceptionUpload e) {
             out.println(e.getMessage());
             out.flush();
-            System.out.println(e.getMessage());
-        }
-        finally {
-
-            System.out.println("ENDED : "+string_request);
         }
     }
 }

@@ -22,7 +22,7 @@ public class ServerConnection implements Runnable{
     private BufferedReader in;
     private PrintWriter out;
 
-    public ServerConnection(Socket s, ServerModel model, ServerNotifier notifier) {
+    ServerConnection(Socket s, ServerModel model, ServerNotifier notifier) {
         client_socket = s;
         server_model = model;
         in = null;
@@ -169,14 +169,15 @@ public class ServerConnection implements Runnable{
                 try{
                     System.out.println("SConnection -> "+cli_resposta);
                     interaction_output = parseInteraction(splited);
-                    out.println(interaction_output);
-                    System.out.println(interaction_output);
                 }
                 catch(ExceptionDownload | ExceptionLogin | ExceptionRegister | ExceptionLogout | ExceptionUpload e){
-                    out.println(e.getMessage());
-                    System.out.println(e.getMessage());
+                    interaction_output = e.getMessage();
                 }
-                out.flush();
+
+                synchronized (this.out) {
+                    out.println(interaction_output);
+                    out.flush();
+                }
 
                 cli_resposta = in.readLine();
             }
@@ -188,11 +189,6 @@ public class ServerConnection implements Runnable{
             System.out.println("CLOSE CONNECTION");
         } catch (IOException e) {
             System.out.println("CLOSE CONNECTION 2");
-            try {
-                client_socket.close();
-            } catch (IOException ex) {
-                System.out.println("CLOSE CONNECTION 3");
-            }
         }
         finally {
             if(out != null) server_notifier.removeClientNotifier(out);

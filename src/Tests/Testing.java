@@ -1,8 +1,7 @@
 package Tests;
 
-import ClientDev.ClientDownloadManager;
 import ClientDev.ClientRequest;
-import ClientDev.ClientUploadManager;
+import ClientDev.ClientTransferManager;
 import Exceptions.ExceptionDownload;
 import Exceptions.ExceptionUpload;
 
@@ -12,21 +11,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Testing implements Runnable{
-
-
-    private  Socket sd = null;
+    private  Socket sd;
     private int id;
 
+    private ClientTransferManager<ClientRequest> cdm;
+    private ClientTransferManager<ClientRequest> cum;
 
-    private ClientDownloadManager cdm;
-    private ClientUploadManager cum;
-
-    public Testing(Socket s, int i) {
+    private Testing(Socket s, int i) {
         sd = s;
         id = i;
 
-        this.cdm = new ClientDownloadManager();
-        this.cum = new ClientUploadManager();
+        this.cdm = new ClientTransferManager<>();
+        this.cum = new ClientTransferManager<>();
     }
 
     private boolean parseUserRequest(String request, PrintWriter out, BufferedReader in, BufferedReader scan)
@@ -42,31 +38,24 @@ public class Testing implements Runnable{
             return true;
         }
         return false;
-        //return request;
     }
 
-    //deixei o in pq evetualmente se for para fazer o cenas dos tickets
-    //esta mal
     private void downloadRequest(String request, BufferedReader in, BufferedReader scan) throws ExceptionDownload, IOException {
         System.out.println("Enter The Name The File Should Have :");
 
-        //Scanner scan = new Scanner(System.in);
         String path = null;
 
             path = scan.readLine();
         if(path.length()>0) {
             ClientRequest r = new ClientRequest(request, "/home/gonca/Downloads/"+path+"_"+this.id);
 
-            cdm.addDownloadRequest(r);
+            cdm.addTransferRequest(r);
         }
     }
 
-    //deixei o out pq evetualmente se for para fazer o cenas dos tickets
-    //esta mal
     private void uploadRequest(String request, PrintWriter out, BufferedReader scan) throws ExceptionUpload, IOException {
         System.out.println("Enter The Path Of The File You Want To Upload :");
 
-       // Scanner scan = new Scanner(scan);
         String path = null;
 
         path = scan.readLine();
@@ -74,7 +63,7 @@ public class Testing implements Runnable{
 
             ClientRequest r = new ClientRequest(request,path);
 
-            cum.addUploadRequest(r);
+            cum.addTransferRequest(r);
         }
     }
 
@@ -146,7 +135,7 @@ public class Testing implements Runnable{
     public static void main(String[] args) {
         List<Thread> ths = new ArrayList<>();
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 15; i++) {
             ths.add(new Thread(new Testing(null,i)));
         }
 
@@ -160,7 +149,4 @@ public class Testing implements Runnable{
             }
         }
     }
-/*
-NAO SEI PORQUE MAS OS DOWNLOADS NESTA CLASSE DE TESTA NAO FUNFA
- */
 }

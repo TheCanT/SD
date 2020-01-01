@@ -1,6 +1,6 @@
 package ServerDev;
 
-import ServerDev.ServerNotifications.SharedQueue;
+import Requests.SharedQueue;
 import ServerDev.ServerNotifications.Notification;
 import ServerDev.ServerNotifications.ServerNotifier;
 
