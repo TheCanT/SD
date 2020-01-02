@@ -33,9 +33,12 @@ public class ClientIn implements Runnable {
                 if (online && server_response.contains("Logout Successful.")){
                     setOnline(false);
                 }
-                System.out.println(" --- --- --- --- --- --- --- --- \n"
-                                        + server_response +
-                                 "\n --- --- --- --- --- --- --- --- \n\n");
+
+                System.out.println(" --- --- --- --- --- --- --- --- \n");
+
+                for (String s : server_response.split("»")) System.out.println(s);
+
+                System.out.println("\n --- --- --- --- --- --- --- --- \n\n");
             }
         } catch (IOException e) {
             e.printStackTrace();

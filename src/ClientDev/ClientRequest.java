@@ -105,6 +105,7 @@ public class ClientRequest implements Runnable,Comparable {
 
         }
         catch ( ExceptionDownload e){
+            System.out.println(e.getMessage());
             out.println(e.getMessage());
             out.flush();
             try
@@ -114,6 +115,7 @@ public class ClientRequest implements Runnable,Comparable {
             catch(IOException ignored) { }
         }
         catch (IOException | ExceptionUpload e) {
+            System.out.println(e.getMessage());
             out.println(e.getMessage());
             out.flush();
         }

@@ -49,7 +49,7 @@ public class ServerConnection implements Runnable{
                 user_logged_in = null;
             } else throw new ExceptionLogout("You Are Not Logged In.");
         }
-        else throw new ExceptionLogout("Incorrect Input (eg. login user).");
+        else throw new ExceptionLogout("Incorrect Input (eg. logout user).");
     }
 
     private void registerController(String[] splited_string) throws ExceptionRegister{
@@ -145,7 +145,15 @@ public class ServerConnection implements Runnable{
 
 
             case "help":
-                return "NO HELP YET";
+                return  "\\\033[1m--- The following commands are available through this server connection. ---\\\033[0m»" +
+                        "login username password»" +
+                        "logout username»" +
+                        "register username password»" +
+                        "download -key music_key»" +
+                        "download  music_title«music_artist«music_year»" +
+                        "upload music_title music_artist music_year tag_1«...«tag_n»" +
+                        "search tag_1«tag_2«tag_3«...«tag_n»" +
+                        "any type of string value should not have spaces.";
 
             default:
                 return Arrays.toString(splited_string) +" -> Try The Command \"help\".";

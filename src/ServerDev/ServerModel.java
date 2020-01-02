@@ -19,10 +19,10 @@ class ServerModel {
 
 
     ServerModel() throws IOException {
-        this.users = ParseFich.loadUsers("/home/gonca/Desktop/test_user");
+        this.users = new HashMap<>();//ParseFich.loadUsers("/home/gonca/Desktop/test_user");
         this.lock_users = new ReentrantLock();
 
-        this.musics = ParseFich.loadMusicas("/home/gonca/Desktop/test_music");
+        this.musics = new HashMap<>();//ParseFich.loadMusicas("/home/gonca/Desktop/test_music");
         this.lock_musics = new ReentrantLock();
         this.transfer_control = new TransferControl(1,1);
     }
@@ -140,11 +140,11 @@ class ServerModel {
             File new_file = new File(PATH_SERVER_MUSICS + music.getKey());
 
             if (new_file.createNewFile()) {
-                out.println("START");
-                out.flush();
                 Request ur = new Request(new DataOutputStream(new FileOutputStream(PATH_SERVER_MUSICS
                         + music.getKey())),new DataInputStream(br)); // 2
 
+                out.println("START");
+                out.flush();
 
                 ur.transferRequest(); // 3
 

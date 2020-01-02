@@ -45,7 +45,7 @@ public class ServerNotifier implements Runnable{
             lock_clients.lock();
             for(PrintWriter client : clients){
                 synchronized (client) {
-                    client.println("Notification >>> " + not.toString());
+                    client.println("\033[38;5;196mNotification >>> " + not.toString()+"\033[0m");
                     client.flush();
                 }
             }
