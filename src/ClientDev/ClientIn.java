@@ -25,12 +25,12 @@ public class ClientIn implements Runnable {
         String server_response = "";
 
         try {
-            while(!server_response.equals("quit")) {
+            while (!server_response.equals("quit")) {
                 server_response = in.readLine();
-                if (!online && server_response.contains("Successful")){
+                if (!online && server_response.contains("Successful")) {
                     setOnline(true);
                 }
-                if (online && server_response.contains("Logout Successful.")){
+                if (online && server_response.contains("Logout Successful.")) {
                     setOnline(false);
                 }
 

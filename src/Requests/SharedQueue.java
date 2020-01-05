@@ -28,12 +28,12 @@ public class SharedQueue<E> {
         int size_queue = queue.size();
 
         boolean bool;
-        do{
+        do {
             bool = queue.offer(n);
             this.queueIsFull(!bool);
-        } while(!bool);
+        } while (!bool);
 
-        if(size_queue == 0) queue_is_empty.signal();
+        if (size_queue == 0) queue_is_empty.signal();
 
         this.queue_lock.unlock();
         return bool;
@@ -47,29 +47,31 @@ public class SharedQueue<E> {
 
         E n = queue.poll();
 
-        if(num_isFull_waiting > 0) queue_is_full.signal();
+        if (num_isFull_waiting > 0) queue_is_full.signal();
 
         this.queue_lock.unlock();
         return n;
     }
 
 
-    private void queueIsEmpty(){
-        while(queue.size() < 1) {
+    private void queueIsEmpty() {
+        while (queue.size() < 1) {
             try {
                 queue_is_empty.await();
-            } catch (InterruptedException ignore) {}
+            } catch (InterruptedException ignore) {
+            }
         }
     }
 
 
-    private void queueIsFull(boolean bool){
+    private void queueIsFull(boolean bool) {
         this.num_isFull_waiting++;
-        while(bool) {
+        while (bool) {
             try {
                 queue_is_full.await();
                 bool = false;
-            } catch (InterruptedException ignore) {}
+            } catch (InterruptedException ignore) {
+            }
         }
         this.num_isFull_waiting--;
     }
@@ -81,12 +83,12 @@ public class SharedQueue<E> {
         int size_queue = queue.size();
 
         boolean bool;
-        do{
+        do {
             bool = queue.add(n);
             this.queueIsFull(!bool);
-        } while(!bool);
+        } while (!bool);
 
-        if(size_queue == 0) queue_is_empty.signal();
+        if (size_queue == 0) queue_is_empty.signal();
 
         this.queue_lock.unlock();
         return bool;
@@ -100,7 +102,7 @@ public class SharedQueue<E> {
 
         E n = queue.remove();
 
-        if(num_isFull_waiting > 0) queue_is_full.signal();
+        if (num_isFull_waiting > 0) queue_is_full.signal();
 
         this.queue_lock.unlock();
         return n;
@@ -114,7 +116,7 @@ public class SharedQueue<E> {
 
         E n = queue.element();
 
-        if(num_isFull_waiting > 0) queue_is_full.signal();
+        if (num_isFull_waiting > 0) queue_is_full.signal();
 
         this.queue_lock.unlock();
         return n;
@@ -128,7 +130,7 @@ public class SharedQueue<E> {
 
         E n = queue.peek();
 
-        if(num_isFull_waiting > 0) queue_is_full.signal();
+        if (num_isFull_waiting > 0) queue_is_full.signal();
 
         this.queue_lock.unlock();
         return n;

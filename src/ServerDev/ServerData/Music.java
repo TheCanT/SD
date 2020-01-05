@@ -55,8 +55,8 @@ public class Music {
         return writer;
     }
 
-    public void swapWriterValue(){
-        this.writer = ! this.writer;
+    public void swapWriterValue() {
+        this.writer = !this.writer;
     }
 
     public String getTitle() {
@@ -79,33 +79,33 @@ public class Music {
         return new HashSet<>(tags);
     }
 
-    public static String tryKey(String title, String artist, String year){
-        return title+year+artist;
+    public static String tryKey(String title, String artist, String year) {
+        return title + year + artist;
     }
 
-    public String getKey(){
-        return this.getTitle()+this.getYear()+this.getArtist();
+    public String getKey() {
+        return this.getTitle() + this.getYear() + this.getArtist();
     }
 
-    public void lockMusic(){
+    public void lockMusic() {
         lock_music.lock();
     }
 
-    public void unlockMusic(){
+    public void unlockMusic() {
         lock_music.unlock();
     }
 
-    public void incrementDownloads(){
+    public void incrementDownloads() {
         this.downloads++;
     }
 
     public void awaitCondWriters() throws InterruptedException {
-        while(this.writer){
+        while (this.writer) {
             this.cond_writer.await();
         }
     }
 
-    public void signalCondWriters(){
+    public void signalCondWriters() {
         this.swapWriterValue();
         this.cond_writer.signalAll();
     }

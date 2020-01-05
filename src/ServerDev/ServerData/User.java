@@ -3,7 +3,6 @@ package ServerDev.ServerData;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class User {
-
     private String username;
     private String password;
 
@@ -11,7 +10,7 @@ public class User {
 
     private ReentrantLock lock;
 
-    public User(String name, String pass){
+    public User(String name, String pass) {
         username = name;
         password = pass;
 
@@ -44,11 +43,11 @@ public class User {
         this.logged = logged;
     }
 
-    public void lockUser(){
+    public void lockUser() {
         lock.lock();
     }
 
-    public void unlockUser(){
+    public void unlockUser() {
         lock.unlock();
     }
 }

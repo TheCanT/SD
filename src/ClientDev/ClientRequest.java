@@ -10,7 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
-public class ClientRequest implements Runnable,Comparable {
+public class ClientRequest implements Runnable, Comparable {
     private Socket socket_request;
 
     private String string_request;
@@ -56,7 +56,7 @@ public class ClientRequest implements Runnable,Comparable {
         out.println("READY");
         out.flush();
         String s = in.readLine();
-        if (!s.equals("START")) throw new ExceptionUpload (s);
+        if (!s.equals("START")) throw new ExceptionUpload(s);
     }
 
     private LocalDateTime getTimeStamp() {
@@ -73,25 +73,24 @@ public class ClientRequest implements Runnable,Comparable {
     public void run() {
         String aa = null;
         try {
-            socket_request = new Socket("localhost",12345);
+            socket_request = new Socket("localhost", 12345);
             out = new PrintWriter(socket_request.getOutputStream());
             in = new BufferedReader(new InputStreamReader(socket_request.getInputStream()));
 
             out.println(string_request);
             out.flush();
 
-            if(string_request.startsWith("upload")){
+            if (string_request.startsWith("upload")) {
                 uploadHandler();
                 uploadStartTransfer();
                 System.out.println("The Upload Has Started.");
-            }else
-            if(string_request.startsWith("download")){
+            } else if (string_request.startsWith("download")) {
                 downloadHandler();
                 downloadStartTransfer();
                 System.out.println("The Download Has Started.");
             }
 
-            Request request = new Request(bw,br);
+            Request request = new Request(bw, br);
             request.transferRequest();
 
 
@@ -99,22 +98,19 @@ public class ClientRequest implements Runnable,Comparable {
 
             aa = in.readLine();
 
-            System.out.println("/\\ /\\ /\\ Your Request \""+(aa==null?"DOWNLOAD" :aa )+"\" Is Completed! /\\ /\\ /\\");
+            System.out.println("/\\ /\\ /\\ Your Request \"" + (aa == null ? "DOWNLOAD" : aa) + "\" Is Completed! /\\ /\\ /\\");
 
 
             socket_request.shutdownInput();
             socket_request.close();
 
-        }
-        catch ( ExceptionDownload e){
+        } catch (ExceptionDownload e) {
             System.out.println(e.getMessage());
-            try
-            {
+            try {
                 Files.deleteIfExists(Paths.get(path));
+            } catch (IOException ignored) {
             }
-            catch(IOException ignored) { }
-        }
-        catch (IOException | ExceptionUpload e) {
+        } catch (IOException | ExceptionUpload e) {
             System.out.println(e.getMessage());
         }
     }

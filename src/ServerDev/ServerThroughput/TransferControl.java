@@ -16,18 +16,17 @@ public class TransferControl {
     private int num_up;
 
 
-    public TransferControl(int max_download, int max_upload){
+    public TransferControl(int max_download, int max_upload) {
         lock_down = new ReentrantLock();
         cond_down = lock_down.newCondition();
-        num_down  = 0;
+        num_down = 0;
         MAX_DOWN = max_download;
 
         lock_up = new ReentrantLock();
         cond_up = lock_up.newCondition();
-        num_up  = 0;
+        num_up = 0;
         MAX_UP = max_upload;
     }
-
 
 
     public ReentrantLock getLockDown() {
@@ -37,7 +36,7 @@ public class TransferControl {
     public void startDownload() throws InterruptedException {
         lock_down.lock();
 
-        while(!(num_down<MAX_DOWN)) cond_down.await();
+        while (!(num_down < MAX_DOWN)) cond_down.await();
 
         num_down++;
 
@@ -47,7 +46,7 @@ public class TransferControl {
     public void endDownload() {
         lock_down.lock();
 
-        if (!(num_down<MAX_DOWN)) cond_down.signal();
+        if (!(num_down < MAX_DOWN)) cond_down.signal();
 
         num_down--;
 
@@ -61,7 +60,7 @@ public class TransferControl {
     public void startUpload() throws InterruptedException {
         lock_up.lock();
 
-        while(!(num_up<MAX_UP)) cond_up.await();
+        while (!(num_up < MAX_UP)) cond_up.await();
 
         num_up++;
 
@@ -71,13 +70,12 @@ public class TransferControl {
     public void endUpload() {
         lock_up.lock();
 
-        if (!(num_up<MAX_UP)) cond_up.signal();
+        if (!(num_up < MAX_UP)) cond_up.signal();
 
         num_up--;
 
         lock_up.unlock();
     }
-
 
 
 }

@@ -5,7 +5,7 @@ import Requests.SharedQueue;
 public class ClientTransferManager<E extends Runnable> implements Runnable {
     private SharedQueue<E> queue;
 
-    public ClientTransferManager(){
+    public ClientTransferManager() {
         this.queue = new SharedQueue<E>();
     }
 
@@ -23,7 +23,10 @@ public class ClientTransferManager<E extends Runnable> implements Runnable {
             E cr = nextTransferRequest();
             Thread upload = new Thread(cr);
             upload.start();
-            try { upload.join(); } catch (InterruptedException ignore) {}
+            try {
+                upload.join();
+            } catch (InterruptedException ignore) {
+            }
         }
     }
 }

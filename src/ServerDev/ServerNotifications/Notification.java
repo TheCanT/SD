@@ -8,7 +8,7 @@ public class Notification implements Comparable {
 
     @Override
     public String toString() {
-        return "["+time_stamp+"] : "+message;
+        return "[" + time_stamp + "] : " + message;
     }
 
     public Notification(String message) {

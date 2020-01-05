@@ -1,5 +1,7 @@
 package ClientDev;
 
+import Requests.Proprities;
+
 import java.io.PrintWriter;
 import java.util.Scanner;
 
@@ -48,7 +50,7 @@ public class ClientOut implements Runnable {
         if(scan.hasNextLine()) {
             path = scan.nextLine();
 
-            ClientRequest r = new ClientRequest(request, "/home/gonca/Downloads/"+path);
+            ClientRequest r = new ClientRequest(request, Proprities.DOWNLOADS_PATH +path);
 
             cdm.addTransferRequest(r);
         }

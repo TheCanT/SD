@@ -6,7 +6,6 @@ public class Request {
     private DataOutputStream bw;
     private DataInputStream br;
 
-    private static final int MAX_READ = 1024;
     private static final int OFFSET = 0;
 
 
@@ -16,15 +15,15 @@ public class Request {
     }
 
     public void transferRequest() throws IOException {
-            int num_read = 0;
-            byte [] byte_read = new byte [MAX_READ];
+        int num_read = 0;
+        byte[] byte_read = new byte[Proprities.MAX_SIZE];
 
-            num_read = br.read(byte_read,OFFSET,MAX_READ);
+        num_read = br.read(byte_read, OFFSET, Proprities.MAX_SIZE);
 
-            while(0 < num_read){
-                bw.write(byte_read,OFFSET,num_read);
-                bw.flush();
-                num_read = br.read(byte_read,OFFSET,MAX_READ);
-            }
+        while (0 < num_read) {
+            bw.write(byte_read, OFFSET, num_read);
+            bw.flush();
+            num_read = br.read(byte_read, OFFSET, Proprities.MAX_SIZE);
+        }
     }
 }

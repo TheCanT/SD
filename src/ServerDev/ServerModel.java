@@ -1,6 +1,7 @@
 package ServerDev;
 
 import Exceptions.*;
+import Requests.Proprities;
 import ServerDev.ServerData.Music;
 import ServerDev.ServerData.User;
 import Requests.Request;
@@ -23,7 +24,7 @@ class ServerModel {
 
         this.musics = new HashMap<>();
         this.lock_musics = new ReentrantLock();
-        this.transfer_control = new TransferControl(10,5);
+        this.transfer_control = new TransferControl(Proprities.MAX_DOWNLOAD,Proprities.MAX_UPLOAD);
     }
 
     void login(String user_in, String pass_in) throws ExceptionLogin {
@@ -72,12 +73,6 @@ class ServerModel {
 
             user.lockUser();
             lock_users.unlock();
-
-/*
-            if (user.getNumCurrentTransfers() > 0)
-                throw new ExceptionLogout("You Can Not Logout With Transfers Remaining.");
- */
-
 
             user.setLogged(false);
 
@@ -191,7 +186,8 @@ class ServerModel {
         }
     }
 
-    private void downloadByKey(String music_key, PrintWriter pw, BufferedReader in, OutputStream os) throws ExceptionDownload {
+    private void downloadByKey(String music_key, PrintWriter pw, BufferedReader in, OutputStream os)
+            throws ExceptionDownload {
         lock_musics.lock();
 
         if (musics.containsKey(music_key)) {
@@ -246,18 +242,22 @@ class ServerModel {
     }
 
 
-    Collection<String> searchByTags(Set<String> music_tags) {
+    ArrayList<String> searchByTags(Set<String> music_tags) {
         lock_musics.lock();
         Collection<Music> musics_now = musics.values();
         lock_musics.unlock();
 
-        Collection<String> musics_with_tags = new ArrayList<>();
+        ArrayList<String> musics_with_tags = new ArrayList<>();
 
         for(Music m : musics_now){
             m.lockMusic();
             for(String tag : m.getTags())
                 if(music_tags.contains(tag))
-                    musics_with_tags.add(m.getKey()+" : "+m.getArtist()+" - "+m.getTitle()+" - ("+m.getYear()+") - ["+m.getDownloads()+"]");
+                    musics_with_tags.add(m.getKey()+" : "
+                            +m.getArtist()+" - "
+                            +m.getTitle()+" - ("
+                            +m.getYear()+") - ["
+                            +m.getDownloads()+"]");
             m.unlockMusic();
         }
 
