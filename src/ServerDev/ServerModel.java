@@ -18,7 +18,7 @@ class ServerModel {
     private ReentrantLock lock_users;
 
 
-    ServerModel() throws IOException {
+    ServerModel() {
         this.users = new HashMap<>();
         this.lock_users = new ReentrantLock();
 

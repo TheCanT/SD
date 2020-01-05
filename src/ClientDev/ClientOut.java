@@ -90,11 +90,15 @@ public class ClientOut implements Runnable {
 
         while(scan.hasNextLine()){
             client_input = scan.nextLine();
-
-            if (!parseUserRequest(client_input)){
-                client_request = client_input;
-                out.println(client_request);
-                out.flush();
+            if(!client_input.contains("»")) {
+                if (!parseUserRequest(client_input)) {
+                    client_request = client_input;
+                    out.println(client_request);
+                    out.flush();
+                }
+            }
+            else{
+                System.out.println("The Input Should Not Contain '»' and spaces in atomic strings.");
             }
         }
     }
