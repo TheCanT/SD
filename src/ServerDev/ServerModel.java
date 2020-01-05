@@ -2,7 +2,6 @@ package ServerDev;
 
 import Exceptions.*;
 import ServerDev.ServerData.Music;
-import Tests.ParseFich;
 import ServerDev.ServerData.User;
 import Requests.Request;
 import ServerDev.ServerThroughput.TransferControl;
@@ -24,7 +23,7 @@ class ServerModel {
 
         this.musics = new HashMap<>();
         this.lock_musics = new ReentrantLock();
-        this.transfer_control = new TransferControl(1,1);
+        this.transfer_control = new TransferControl(10,5);
     }
 
     void login(String user_in, String pass_in) throws ExceptionLogin {
