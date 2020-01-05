@@ -116,6 +116,11 @@ class ServerModel {
             throw new ExceptionUpload("This Music Already Exists.");
         }
 
+        if(!year_upload.matches("[0-9]+")){
+            lock_musics.unlock();
+            throw  new ExceptionUpload("The music_year Is Not Filled Correctly.");
+        }
+
         Music music = new Music(title_upload, artist_upload, Integer.parseInt(year_upload), tags_upload);
 
         music.lockMusic();
@@ -257,7 +262,8 @@ class ServerModel {
                             +m.getArtist()+" - "
                             +m.getTitle()+" - ("
                             +m.getYear()+") - ["
-                            +m.getDownloads()+"]");
+                            +m.getDownloads()+"] - Tags: "
+                            +m.getTags());
             m.unlockMusic();
         }
 
