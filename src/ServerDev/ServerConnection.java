@@ -74,7 +74,7 @@ public class ServerConnection implements Runnable {
                 throw new ExceptionUpload("Error Upload (code:2)");
             }
             server_model.upload(splited_string[1], splited_string[2], splited_string[3],
-                    Collections.singleton(splited_string[4]), client_socket.getInputStream(), out);
+                    Set.of(splited_string[4].split("«")), client_socket.getInputStream(), out);
         } else throw new ExceptionUpload("Incorrect Input (eg. upload music_title music_artist " +
                 "music_year tag_1«...«tag_n");
     }
