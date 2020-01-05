@@ -28,8 +28,8 @@ public class Client {
             s.shutdownOutput();
             s.shutdownInput();
             s.close();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e) {
+            System.out.println("Error Connecting To The Server.");
+        } catch(InterruptedException ignore) {}
     }
 }
