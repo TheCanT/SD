@@ -83,10 +83,12 @@ public class ClientRequest implements Runnable,Comparable {
             if(string_request.startsWith("upload")){
                 uploadHandler();
                 uploadStartTransfer();
+                System.out.println("The Upload Has Started.");
             }else
             if(string_request.startsWith("download")){
                 downloadHandler();
                 downloadStartTransfer();
+                System.out.println("The Download Has Started.");
             }
 
             Request request = new Request(bw,br);
@@ -106,8 +108,6 @@ public class ClientRequest implements Runnable,Comparable {
         }
         catch ( ExceptionDownload e){
             System.out.println(e.getMessage());
-            out.println(e.getMessage());
-            out.flush();
             try
             {
                 Files.deleteIfExists(Paths.get(path));
@@ -116,8 +116,6 @@ public class ClientRequest implements Runnable,Comparable {
         }
         catch (IOException | ExceptionUpload e) {
             System.out.println(e.getMessage());
-            out.println(e.getMessage());
-            out.flush();
         }
     }
 }

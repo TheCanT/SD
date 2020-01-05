@@ -25,7 +25,6 @@ public class ClientOut implements Runnable {
                 return true;
             }
             uploadRequest(request);
-            System.out.println("The Upload Has Started.");
             return true;
         }
         if (request.startsWith("download")) {
@@ -34,7 +33,6 @@ public class ClientOut implements Runnable {
                 return true;
             }
             downloadRequest(request);
-            System.out.println("The Download Has Started.");
             return true;
         }
         return false;
