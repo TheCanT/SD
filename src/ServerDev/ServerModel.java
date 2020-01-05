@@ -19,10 +19,10 @@ class ServerModel {
 
 
     ServerModel() throws IOException {
-        this.users = new HashMap<>();//ParseFich.loadUsers("/home/gonca/Desktop/test_user");
+        this.users = new HashMap<>();
         this.lock_users = new ReentrantLock();
 
-        this.musics = new HashMap<>();//ParseFich.loadMusicas("/home/gonca/Desktop/test_music");
+        this.musics = new HashMap<>();
         this.lock_musics = new ReentrantLock();
         this.transfer_control = new TransferControl(1,1);
     }
